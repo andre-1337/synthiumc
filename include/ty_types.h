@@ -1,6 +1,9 @@
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum TyTypes : int32_t {
     TY_UNKNOWN,

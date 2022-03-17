@@ -1,6 +1,9 @@
 #pragma once
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "path.h"
 #include "utils.h"

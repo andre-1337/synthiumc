@@ -1,7 +1,9 @@
 #pragma once
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum ErrorCodes : int32_t {
     OK,
