@@ -3,6 +3,20 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+typedef enum ErrorCodes {
+    OK,
+    ERROR_PATH_EMPTY,
+    ERROR_COULD_NOT_OPEN_FILE,
+    ERROR_COULD_NOT_ALLOCATE_BUFFER,
+    ERROR_COULD_NOT_READ_FILE,
+    ERROR_UNEXPECTED_EOF,
+    ERROR_EXPECTED_BUT_GOT,
+    ERROR_UNKNOWN_SYMBOL,
+    ERROR_CHAR_LIT_LEN,
+    ERROR_COULD_NOT_PARSE_STMT,
+    ERROR_INVALID_TYPE_IDENT
+} ErrorCodes;
+
 char const *const error_texts[] = {
     NULL,
     "path was empty",

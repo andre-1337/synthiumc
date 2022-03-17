@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "span.h"
+#include "source.h"
+
 typedef enum TokenType {
     TOKEN_UNKNOWN_ERR,
     TOKEN_CHAR_ERR,
@@ -135,3 +138,19 @@ char const *const get_str(int32_t index, size_t len, char const *const *array);
 char const *const tok2str(TokenType type);
 char const *const unary2str(TokenType op);
 char const *const binary2str(TokenType type);
+typedef struct Token {
+    TokenType ty;
+    Span span;
+    char *const lexeme;
+} Token;
+
+typedef struct Lexer {
+    bool has_peek;
+    int32_t ctx;
+    int32_t source_len;
+    Token peek;
+    SourceFile source;
+    char *const start;
+    char *const current;
+    SpanInterner *span_interner;
+} Lexer;
