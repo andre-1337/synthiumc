@@ -12,10 +12,10 @@ typedef struct Ident {
     Span ident_span;
 } Ident;
 
-Ident create_ident(Token t);
-Ident empty_ident();
-int32_t len(Ident *i, SpanInterner *si);
-char char_at(Ident *i, int32_t pos);
-int32_t index_of(Ident *i, int32_t ident_len, char c);
-char *const to_string(Ident *i, SpanInterner *si);
-Ident from_str(Span span, char *const str);
+Ident ident_create(Token t);
+Ident ident_empty();
+int32_t ident_len(Ident *i, SpanInterner *si);
+char ident_char_at(Ident *i, int32_t pos);
+int32_t ident_index_of(Ident *i, int32_t ident_len, char c);
+char *const ident_to_string(Ident *i, SpanInterner *si);
+Ident ident_from_str(Span span, char *const str);

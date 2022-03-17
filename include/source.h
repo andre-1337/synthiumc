@@ -12,8 +12,8 @@ typedef struct SourceFile {
     char *const code;
 } SourceFile;
 
-SourceFile empty_sourcefile();
-char *const file_name_dup(SourceFile *sf);
-char *const code(SourceFile *sf);
-int32_t read(PathBuf pb, SourceFile *sf);
-int32_t find_line(BigSpan *span, SourceFile *file, int32_t *last_nl_pos);
+SourceFile source_empty();
+char *const source_file_name_dup(SourceFile *sf);
+char *const source_code(SourceFile *sf);
+int32_t source_read(PathBuf pb, SourceFile *sf);
+int32_t source_find_line(BigSpan *span, SourceFile *file, int32_t *last_nl_pos);

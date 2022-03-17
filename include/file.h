@@ -9,8 +9,8 @@ typedef struct File {
     PathBuf path;
 } File;
 
-File create(PathBuf path);
-int32_t read_to_string(File *s, char *const dest);
-File empty_file();
-char *const name_dup(File *f);
-void free_f(File *f);
+File file_create(PathBuf path);
+int32_t file_read_to_string(File *s, char *const dest);
+File file_empty();
+char *const file_name_dup(File *f);
+void file_free(File *f);

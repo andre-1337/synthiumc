@@ -33,4 +33,4 @@ char const *const error_texts[] = {
 
 size_t const len_error_strings = sizeof(error_texts) / sizeof(char *);
 
-char const *const err2str(int32_t err_code, ...);
+char const *const error_err2str(int32_t err_code, ...);
