@@ -15,6 +15,57 @@
 
 struct Ty;
 
+typedef enum ExprType {
+    EXPR_INT = 1,
+    EXPR_STRING,
+    EXPR_CHAR,
+    EXPR_BINARY,
+    EXPR_UNARY,
+    EXPR_IDENT,
+    EXPR_ASSIGN,
+    EXPR_CALL,
+    EXPR_INIT,
+    EXPR_ACCESS,
+    EXPR_AS,
+    EXPR_NEW
+} ExprType;
+
+typedef enum BinaryType {
+    BINARY_ADD = 1,
+    BINARY_SUB,
+    BINARY_MUL,
+    BINARY_DIV,
+    BINARY_MOD,
+    BINARY_ST,
+    BINARY_SE,
+    BINARY_GT,
+    BINARY_GE,
+    BINARY_LOG_AND,
+    BINARY_LOG_OR,
+    BINARY_EQ,
+    BINARY_NE
+} BinaryType;
+
+typedef enum UnaryType {
+    UNARY_REF,
+    UNARY_DEREF,
+    UNARY_NEG_BOOL,
+    UNARY_NEG_NUM
+} UnaryType;
+
+typedef enum StmtType {
+    STMT_EXPR = 1,
+    STMT_LET,
+    STMT_IMPORT,
+    STMT_FUNC_DECL,
+    STMT_STRUCT_DECL,
+    STMT_BLOCK,
+    STMT_IF,
+    STMT_WHILE,
+    STMT_DELETE,
+    STMT_RETURN
+} StmtType;
+
 typedef struct Stmt {
     int32_t tag;
 } Stmt;
@@ -153,12 +204,12 @@ typedef struct BinaryExpr {
     Expr e;
     Expr *left;
     Expr *right;
-    int32_t ty;
+    BinaryType ty;
 } BinaryExpr;
 
 typedef struct UnaryExpr {
     Expr e;
-    int32_t kind;
     Expr *right;
+    UnaryType ty;
 } UnaryExpr;
 
