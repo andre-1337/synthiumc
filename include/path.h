@@ -19,7 +19,7 @@ typedef struct PathBuf {
 } PathBuf;
 
 Path empty_path();
-Path create(char *const value, int32_t len);
+Path create_path(char *const value, int32_t len);
 bool ends_with(Path *p, char *const s);
 int32_t from_str(char *const s, Path *p);
 Path parent(Path *p);

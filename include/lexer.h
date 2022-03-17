@@ -134,10 +134,6 @@ size_t const len_token_strings = sizeof(token_strings) / sizeof(char *);
 size_t const len_unary_strings = sizeof(unary_type_ops) / sizeof(char *);
 size_t const len_binary_strings = sizeof(binary_type_ops) / sizeof(char *);
 
-char const *const get_str(int32_t index, size_t len, char const *const *array);
-char const *const tok2str(TokenType type);
-char const *const unary2str(TokenType op);
-char const *const binary2str(TokenType type);
 typedef struct Token {
     TokenType ty;
     Span span;
@@ -154,3 +150,37 @@ typedef struct Lexer {
     char *const current;
     SpanInterner *span_interner;
 } Lexer;
+
+char const *const get_str(int32_t index, size_t len, char const *const *array);
+char const *const tok2str(TokenType type);
+char const *const unary2str(TokenType op);
+char const *const binary2str(TokenType type);
+Token empty_token();
+bool is_err(Token *token);
+Lexer create_lexer(SourceFile src, SpanInterner *si, int32_t ctx);
+int32_t current_pos(Lexer *l);
+int32_t end_pos(Lexer *l);
+int32_t current(Lexer *l);
+Token peek(Lexer *l);
+void skip_until(Lexer *l, int32_t ch);
+Token next_token(Lexer *l);
+Token get_next_token(Lexer *l);
+bool is_num(int32_t ch);
+bool is_ws(int32_t ch);
+bool is_letter(int32_t ch);
+Token lex_ident(Lexer *l);
+Token lex_num(Lexer *l);
+Token lex_string(Lexer *l);
+Token lex_char(Lexer *l);
+int32_t check_keyword(Lexer *l, int32_t start, int32_t rest_len, char *const rest, TokenType ty);
+int32_t ident_type(Lexer *l);
+void skip_ws(Lexer *l);
+bool at_end(Lexer *l);
+int32_t advance(Lexer *l);
+Span span_create(Lexer *l, int32_t start, int32_t end);
+Token create_token(Lexer *l, TokenType ty, char *const start, char *const end);
+Token create_token_from_span(Lexer *l, TokenType ty, char *const start, Span span);
+Token token_from_start(Lexer *l, TokenType ty);
+char *const token_ty_to_static_string(TokenType ty);
+bool token_to_string(Token *token, SpanInterner *si, char *const dest);
+int32_t token_len(Token *token, SpanInterner *si);

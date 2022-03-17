@@ -29,7 +29,7 @@ typedef struct SpanInterner {
 
 Span empty_span();
 Span merge(SpanInterner *si, Span first, Span second);
-Span create(SpanInterner *si, int32_t start, int32_t end, int32_t ctx);
+Span create_span(SpanInterner *si, int32_t start, int32_t end, int32_t ctx);
 bool is_interned(Span *span);
 SpanInterner create_interner();
 int32_t intern(SpanInterner *si, BigSpan *span);
