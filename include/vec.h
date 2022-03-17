@@ -12,7 +12,7 @@ typedef struct Vec {
 } Vec;
 
 Vec create_vec(int32_t elem_size);
-Vec with_cap(int32_t elem_size, int32_t cap);
+Vec vec_with_cap(int32_t elem_size, int32_t cap);
 void push(Vec *v, void *elem);
 bool get(Vec *v, int32_t i, void *ptr);
 void *get_ptr(Vec *v, int32_t i);
