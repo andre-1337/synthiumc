@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef enum ErrorCodes {
+typedef enum ErrorCodes : int32_t {
     OK,
     ERROR_PATH_EMPTY,
     ERROR_COULD_NOT_OPEN_FILE,

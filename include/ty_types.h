@@ -1,6 +1,8 @@
 #pragma once
 
-typedef enum TyTypes {
+#include <stdint.h>
+
+typedef enum TyTypes : int32_t {
     TY_UNKNOWN,
     TY_PTR,
     TY_I32,

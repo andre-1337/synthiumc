@@ -7,7 +7,7 @@
 #include "span.h"
 #include "source.h"
 
-typedef enum TokenType {
+typedef enum TokenType : int32_t {
     TOKEN_UNKNOWN_ERR,
     TOKEN_CHAR_ERR,
     TOKEN_INT,
