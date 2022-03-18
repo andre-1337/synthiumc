@@ -3,9 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include <stdbool.h>
 
-typedef enum ErrorCodes : int32_t {
+#include "utils.h"
+
+typedef enum ErrorCode : int32_t {
     OK,
     ERROR_PATH_EMPTY,
     ERROR_COULD_NOT_OPEN_FILE,
@@ -17,22 +20,6 @@ typedef enum ErrorCodes : int32_t {
     ERROR_CHAR_LIT_LEN,
     ERROR_COULD_NOT_PARSE_STMT,
     ERROR_INVALID_TYPE_IDENT
-} ErrorCodes;
+} ErrorCode;
 
-char const *const error_texts[] = {
-    NULL,
-    "path was empty",
-    "could not open file '%s'",
-    "could not allocate buffer",
-    "could not read file '%s'",
-    "unexpected eof",
-    "expected '%s'; got '%s' instead",
-    "unknown symbol '%.*s'",
-    "character literal with invalid length of %1$d: '%.*s'",
-    "could not parse statement\n%.*s",
-    "illegal type identifier '%.*s': '%s'"
-};
-
-size_t const len_error_strings = sizeof(error_texts) / sizeof(char *);
-
-char const *const error_err2str(int32_t err_code, ...);
+const char *error_err2str(ErrorCode err_code, ...);

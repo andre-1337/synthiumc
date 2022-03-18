@@ -3,24 +3,27 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
-static char const *const standard_library_files[] = {
+#include "error.h"
+
+static char const *standard_library_files[] = {
     "io.syn"
 };
 
 size_t const len_stdlib_files = sizeof(standard_library_files) / sizeof(char *);
 
 int32_t get_errno();
-char const *const cwd(const char *buf, int32_t buf_size);
-int32_t vmft_str(char **dest, const char *fmt, va_list args);
-char const *const fmt_str(const char *fmt, ...);
+int32_t vfmt_str(char **dest, const char *fmt, va_list args);
+char const *fmt_str(const char *fmt, ...);
 int32_t num_stdlib_files();
-char const *const *get_stdlib_files();
+char const **get_stdlib_files();
 bool is_file(const char *path);
-int32_t read_file(const char *path, const char **content);
+ErrorCode read_file(const char *path, const char **content);
 uint64_t next_pow_of_2(uint64_t num);
 float int2flt(int64_t i);
 int32_t read_char(const char *string, int32_t s_len, int32_t *ch);

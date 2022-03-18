@@ -152,10 +152,10 @@ typedef struct Lexer {
     SpanInterner *span_interner;
 } Lexer;
 
-char const *const lexer_get_str(int32_t index, size_t len, char const *const *array);
-char const *const lexer_tok2str(TokenType type);
-char const *const lexer_unary2str(TokenType op);
-char const *const lexer_binary2str(TokenType type);
+const char *lexer_get_str(int32_t index, size_t len, const char **array);
+const char *lexer_tok2str(TokenType type);
+const char *lexer_unary2str(TokenType op);
+const char *lexer_binary2str(TokenType type);
 Token lexer_empty_token();
 bool lexer_is_err(Token *token);
 Lexer lexer_create(SourceFile src, SpanInterner *si, int32_t ctx);
