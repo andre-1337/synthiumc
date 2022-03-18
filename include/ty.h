@@ -71,34 +71,43 @@ typedef struct Mod {
 Ty *ty_new_i32();
 bool ty_is_i32(Ty *t);
 I32 *ty_as_i32(Ty *t);
+
 Ty *ty_new_ptr(int32_t count, Ty *inner);
 bool ty_is_ptr(Ty *t);
 Ptr *ty_as_ptr(Ty *t);
+
 Ty *ty_new_string();
 bool ty_is_string(Ty *t);
 String *ty_as_string(Ty *t);
+
 Ty *ty_new_struct(Ident name, Vec fields);
 void ty_init_struct(Ty *t, Ident name);
 bool ty_is_struct(Ty *t);
+
 Struct *ty_as_struct(Ty *t);
 void ty_push_field(Struct *t, Ident name, Ty *ty);
 StructField *ty_field_at(Struct *t, int32_t i);
 int32_t ty_num_fields(Struct *t);
+
 Ty *ty_new_func(Ty *ret, Ptrvec params, Ident name);
 bool ty_is_func(Ty *t);
 Func *ty_as_func(Ty *t);
+
 Ty *ty_new_mod();
 bool ty_is_mod(Ty *t);
 Mod *ty_as_mod(Ty *t);
+
 Ty *ty_new_placeholder_type(TyTypes kind, int32_t size);
 Ty ty_create_type(TyTypes ty);
 bool is_initialized(Ty *t);
 bool is_scoped(Ty *t);
+
 TypeList ty_new_empty_list();
 TypeList ty_create_type_list(Ptrvec types);
 Ty *ty_type_at(TypeList *tl, int32_t i);
 void ty_type_list_free(TypeList *tl);
 void ty_type_free(Ty *t);
+
 bool ty_width_was_calculated(Ty *t);
 bool ty_fill_width_align(Ty *t);
 char *const ty_to_string(Ty *t, SpanInterner *si);
