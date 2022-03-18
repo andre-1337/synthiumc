@@ -193,17 +193,17 @@ typedef struct IdentExpr {
 
 typedef struct IntExpr {
     Expr e;
-    char *const ptr;
+    const char *ptr;
 } IntExpr;
 
 typedef struct StringExpr {
     Expr e;
-    char *const ptr;
+    const char *ptr;
 } StringExpr;
 
 typedef struct CharExpr {
     Expr e;
-    char *const ptr;
+    const char *ptr;
 } CharExpr;
 
 typedef struct BinaryExpr {
@@ -252,7 +252,7 @@ Stmt *ast_new_struct_decl_stmt(SpanInterner *si, Ident name, Vec fields);
 bool ast_is_struct_decl_stmt(Stmt *s);
 StructDeclStmt *ast_as_struct_decl_stmt(Stmt *s);
 
-Stmt *ast_new_import_stmt(Span span, char *const path);
+Stmt *ast_new_import_stmt(Span span, const char *path);
 bool ast_is_import_stmt(Stmt *s);
 ImportStmt *ast_as_import_stmt(Stmt *s);
 
@@ -291,15 +291,15 @@ Expr *ast_new_ident_expr(Token ident);
 bool ast_is_ident_expr(Expr *e);
 IdentExpr *ast_as_ident_expr(Expr *e);
 
-Expr *ast_new_int_expr(Span span, char *const ptr);
+Expr *ast_new_int_expr(Span span, const char *ptr);
 bool ast_is_int_expr(Expr *e);
 IntExpr *ast_as_int_expr(Expr *e);
 
-Expr *ast_new_string_expr(Span span, char *const ptr);
+Expr *ast_new_string_expr(Span span, const char *ptr);
 bool ast_is_string_expr(Expr *e);
 StringExpr *ast_as_string_expr(Expr *e);
 
-Expr *ast_new_char_expr(Span span, char *const ptr);
+Expr *ast_new_char_expr(Span span, const char *ptr);
 bool ast_is_char_expr(Expr *e);
 CharExpr *ast_as_char_expr(Expr *e);
 
@@ -313,14 +313,14 @@ UnaryExpr *ast_as_unary_expr(Expr *e);
 
 Expr ast_create_expr(ExprType tag, Span span);
 void ast_expr_free(Expr *e);
-char *const ast_expr_to_string(Expr *e, SpanInterner *si);
+const char *ast_expr_to_string(Expr *e, SpanInterner *si);
 
 ArgList ast_create_arg_list();
 int32_t ast_num_args(ArgList *al);
 Expr *ast_get_arg_al(ArgList *al, int32_t i);
 void ast_push_arg(ArgList *al, Expr *arg);
 void ast_free_al(ArgList *al);
-char *const ast_arg_list_to_string(ArgList *al, SpanInterner *si);
+const char *ast_arg_list_to_string(ArgList *al, SpanInterner *si);
 
 Init ast_create_init(Ident ident, Expr *expr);
 Init ast_empty_init();
@@ -330,4 +330,4 @@ Expr *ast_get_init_expr(InitList *il, int32_t i);
 bool ast_get_init_at(InitList *il, int32_t i, Init *dest);
 void ast_push_init(InitList *il, Init init);
 void ast_free_il(InitList *il);
-char *const ast_init_list_to_string(InitList *il, SpanInterner *si);
+const char *ast_init_list_to_string(InitList *il, SpanInterner *si);

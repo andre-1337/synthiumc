@@ -19,7 +19,7 @@
 
 typedef struct ParseError {
     Span span;
-    char *const text;
+    const char *text;
 } ParseError;
 
 typedef struct Parser {
@@ -74,9 +74,9 @@ Expr *parser_infix(Parser *p, Token *token, Expr *left, bool no_struct);
 int32_t parser_sync(Parser *p);
 int32_t parser_inner_sync(Parser *p);
 
-ParseError parser_create_error(Span span, char *const text);
-ParseError parser_create_type_ident_error(Parser *p, Span span, char *const text, char *const reason);
+ParseError parser_create_error(Span span, const char *text);
+ParseError parser_create_type_ident_error(Parser *p, Span span, const char *text, const char *reason);
 ParseError parser_create_statement_error(Parser *p, int32_t start, int32_t end);
 ParseError parser_create_lex_error(Parser *p, Token *next);
 ParseError parser_create_consume_error(Parser *p, Token *peek, TokenType expected_ty);
-ParseError parser_create_consume_error_text(Parser *p, Token *peek, char *const text);
+ParseError parser_create_consume_error_text(Parser *p, Token *peek, const char *text);

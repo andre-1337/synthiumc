@@ -24,9 +24,9 @@ typedef struct ScopeStack {
 Scope scope_create();
 void scope_free(Scope *s);
 bool scope_bind_in(Scope *s, SpanInterner *si, Ident ident, Ty value);
-bool scope_s_bind_in(Scope *s, int32_t ident_len, char *const ident, Ty value);
+bool scope_s_bind_in(Scope *s, int32_t ident_len, const char *ident, Ty value);
 Ty *scope_get_in(Scope *s, SpanInterner *si, Ident *ident);
-Ty *scope_s_get_in(Scope *s, int32_t key_len, char *const key);
+Ty *scope_s_get_in(Scope *s, int32_t key_len, const char *key);
 
 ScopeStack scope_empty_stack();
 ScopeStack scope_create_stack(SpanInterner *si);

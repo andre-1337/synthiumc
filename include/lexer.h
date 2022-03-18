@@ -138,7 +138,7 @@ size_t const len_binary_strings = sizeof(binary_type_ops) / sizeof(char *);
 typedef struct Token {
     TokenType ty;
     Span span;
-    char *const lexeme;
+    const char *lexeme;
 } Token;
 
 typedef struct Lexer {
@@ -147,8 +147,8 @@ typedef struct Lexer {
     int32_t source_len;
     Token peek;
     SourceFile source;
-    char *const start;
-    char *const current;
+    const char *start;
+    const char *current;
     SpanInterner *span_interner;
 } Lexer;
 
@@ -173,15 +173,15 @@ Token lexer_lex_ident(Lexer *l);
 Token lexer_lex_num(Lexer *l);
 Token lexer_lex_string(Lexer *l);
 Token lexer_lex_char(Lexer *l);
-int32_t lexer_check_keyword(Lexer *l, int32_t start, int32_t rest_len, char *const rest, TokenType ty);
+int32_t lexer_check_keyword(Lexer *l, int32_t start, int32_t rest_len, const char *rest, TokenType ty);
 int32_t lexer_ident_type(Lexer *l);
 void lexer_skip_ws(Lexer *l);
 bool lexer_at_end(Lexer *l);
 int32_t lexer_advance(Lexer *l);
 Span lexer_create_span(Lexer *l, int32_t start, int32_t end);
-Token lexer_create_token(Lexer *l, TokenType ty, char *const start, char *const end);
-Token lexer_create_token_from_span(Lexer *l, TokenType ty, char *const start, Span span);
+Token lexer_create_token(Lexer *l, TokenType ty, const char *start, const char *end);
+Token lexer_create_token_from_span(Lexer *l, TokenType ty, const char *start, Span span);
 Token lexer_token_from_start(Lexer *l, TokenType ty);
-char *const lexer_token_ty_to_static_string(TokenType ty);
-bool lexer_token_to_string(Token *token, SpanInterner *si, char *const dest);
+const char *lexer_token_ty_to_static_string(TokenType ty);
+bool lexer_token_to_string(Token *token, SpanInterner *si, const char *dest);
 int32_t lexer_token_len(Token *token, SpanInterner *si);

@@ -110,5 +110,5 @@ void ty_type_free(Ty *t);
 
 bool ty_width_was_calculated(Ty *t);
 bool ty_fill_width_align(Ty *t);
-char *const ty_to_string(Ty *t, SpanInterner *si);
+const char *ty_to_string(Ty *t, SpanInterner *si);
 Ty *ty_clone(Ty *t);

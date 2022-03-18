@@ -13,7 +13,7 @@
 
 typedef struct Key {
     int32_t len;
-    char *const value;
+    const char *value;
 } Key;
 
 typedef struct Item {
@@ -32,10 +32,10 @@ typedef struct Map {
     int32_t cap;
 } Map;
 
-int32_t map_hash(char *const key);
-int32_t map_get_idx(int32_t cap, char *const key, int32_t key_len);
+int32_t map_hash(const char *key);
+int32_t map_get_idx(int32_t cap, const char *key, int32_t key_len);
 Key map_key_from_ident(SpanInterner *si, Ident *ident);
-Key map_create_key(int32_t len, char *const value);
+Key map_create_key(int32_t len, const char *value);
 Map map_create();
 Map map_with_cap(int32_t cap);
 void map_free(Map *m);

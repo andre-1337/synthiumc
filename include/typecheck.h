@@ -37,7 +37,7 @@ typedef struct WaitingRequestMap {
 } WaitingRequestMap;
 
 typedef struct TypeError {
-    char *const text;
+    const char *text;
     Span span;
 } TypeError;
 
@@ -66,13 +66,13 @@ void typecheck_add_request(WaitingRequestMap *wrm, SpanInterner *si, WaitingRequ
 Vec *typecheck_get_waiting(WaitingRequestMap *wrm, SpanInterner *si, Ident *ident);
 void typecheck_free_wait_map(WaitingRequestMap *wrm);
 
-TypeError typecheck_err(TypeChecker *tc, char *const text, Span span);
+TypeError typecheck_err(TypeChecker *tc, const char *text, Span span);
 void typecheck_free_err(TypeError *err);
 
 Ctx typecheck_empty_ctx();
 Ctx typecheck_create_ctx(Module *mod, SpanInterner *si, Scope *global);
 void typecheck_free_ctx(Ctx *ctx);
-Module *typecheck_get_mod_by_alias(Ctx *ctx, int32_t alias_len, char *const alias);
+Module *typecheck_get_mod_by_alias(Ctx *ctx, int32_t alias_len, const char *alias);
 
 TypeChecker typecheck_create(SpanInterner *si, ModuleMap *mods);
 void typecheck_wait_for(TypeChecker *tc, WaitingRequest req);
@@ -80,7 +80,7 @@ WaitingRequestMap *typecheck_get_waiting_map(TypeChecker *tc, Module *mod);
 Scope typecheck_create_global_scope(TypeChecker *tc);
 int32_t typecheck_num_errs(TypeChecker *tc);
 void typecheck_push_err(TypeChecker *tc, TypeError error);
-void typecheck_push_mk_error(TypeChecker *tc, char *const string, Span span);
+void typecheck_push_mk_error(TypeChecker *tc, const char *string, Span span);
 TypeError *typecheck_get_err(TypeChecker *tc, int32_t i);
 void typecheck_add_import_alias(TypeChecker *tc, Ident *ident, Module *mod);
 int32_t *typecheck_sorted_mods(ModuleMap *mods, SpanInterner *si);
