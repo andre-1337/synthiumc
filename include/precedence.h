@@ -20,4 +20,4 @@ typedef enum Precedence : int32_t {
     PRECEDENCE_ACCESS
 } Precedence;
 
-int32_t precedence_get(TokenType ty);
+Precedence precedence_get(TokenType ty);
