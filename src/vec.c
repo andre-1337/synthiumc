@@ -1,6 +1,6 @@
 #include "../include/vec.h"
 
-Vec vec_create(int32_t elem_size) {
+Vec vec_create(int64_t elem_size) {
     Vec vec = { 
         .len = 0, 
         .cap = 0, 
@@ -11,7 +11,7 @@ Vec vec_create(int32_t elem_size) {
     return vec;
 }
 
-Vec vec_with_cap(int32_t elem_size, int32_t cap) {
+Vec vec_with_cap(int64_t elem_size, int64_t cap) {
     Vec vec = {
         .len = 0,
         .cap = cap,
@@ -34,7 +34,7 @@ void vec_init_zero(Vec *v) {
     memset(v->elements, 0, v->elem_size * v->cap);
 }
 
-bool vec_get(Vec *v, int32_t i, void *ptr) {
+bool vec_get(Vec *v, int64_t i, void *ptr) {
     if (i >= 0 && i < v->len) {
         memcpy(ptr, v->elements + i * v->elem_size, v->elem_size);
         return true;
@@ -43,7 +43,7 @@ bool vec_get(Vec *v, int32_t i, void *ptr) {
     return false;
 }
 
-void *vec_get_ptr(Vec *v, int32_t i) {
+void *vec_get_ptr(Vec *v, int64_t i) {
     if (i >= 0 && i < v->len) {
         return v->elements + i * v->elem_size;
     }
