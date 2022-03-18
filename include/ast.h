@@ -15,7 +15,7 @@
 
 struct Ty;
 
-typedef enum ExprType {
+typedef enum ExprType : int32_t {
     EXPR_INT = 1,
     EXPR_STRING,
     EXPR_CHAR,
@@ -30,7 +30,7 @@ typedef enum ExprType {
     EXPR_NEW
 } ExprType;
 
-typedef enum BinaryType {
+typedef enum BinaryType : int32_t {
     BINARY_ADD = 1,
     BINARY_SUB,
     BINARY_MUL,
@@ -46,14 +46,14 @@ typedef enum BinaryType {
     BINARY_NE
 } BinaryType;
 
-typedef enum UnaryType {
+typedef enum UnaryType : int32_t {
     UNARY_REF,
     UNARY_DEREF,
     UNARY_NEG_BOOL,
     UNARY_NEG_NUM
 } UnaryType;
 
-typedef enum StmtType {
+typedef enum StmtType : int32_t {
     STMT_EXPR = 1,
     STMT_LET,
     STMT_IMPORT,
@@ -66,7 +66,7 @@ typedef enum StmtType {
     STMT_RETURN
 } StmtType;
 
-typedef enum ElseType {
+typedef enum ElseType : int32_t {
     ELSE_TYPE_NO_ELSE,
     ELSE_TYPE_BLOCK,
     ELSE_TYPE_ELSE_IF
