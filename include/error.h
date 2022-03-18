@@ -6,8 +6,6 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "utils.h"
-
 typedef enum ErrorCode : int32_t {
     OK,
     ERROR_PATH_EMPTY,

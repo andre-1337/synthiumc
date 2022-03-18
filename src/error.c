@@ -1,4 +1,5 @@
 #include "../include/error.h"
+#include "../include/utils.h"
 
 const char *error_texts[] = {
     NULL,
