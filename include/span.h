@@ -12,15 +12,15 @@
 #define MAX_CTX 65535
 
 typedef struct Span {
-    int32_t start;
-    int32_t len_or_tag;
-    int32_t ctx_or_idx;
+    uint32_t start;
+    uint16_t len_or_tag;
+    uint16_t ctx_or_idx;
 } Span;
 
 typedef struct BigSpan {
-    int32_t start;
-    int32_t len;
-    int32_t ctx;
+    uint32_t start;
+    uint16_t len;
+    uint16_t ctx;
 } BigSpan;
 
 typedef struct SpanInterner {
@@ -29,11 +29,11 @@ typedef struct SpanInterner {
 
 Span span_empty();
 Span span_merge(SpanInterner *si, Span first, Span second);
-Span span_create(SpanInterner *si, int32_t start, int32_t end, int32_t ctx);
+Span span_create(SpanInterner *si, uint32_t start, uint32_t end, uint16_t ctx);
 bool span_is_interned(Span *span);
 
 SpanInterner span_create_interner();
-int32_t span_intern(SpanInterner *si, BigSpan *span);
+uint32_t span_intern(SpanInterner *si, BigSpan *span);
 BigSpan span_get(SpanInterner *si, Span span);
-BigSpan span_get_idx(SpanInterner *si, int32_t idx);
+BigSpan span_get_idx(SpanInterner *si, uint16_t idx);
 void span_free_interner(SpanInterner *si);
