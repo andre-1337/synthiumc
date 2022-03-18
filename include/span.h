@@ -31,6 +31,7 @@ Span span_empty();
 Span span_merge(SpanInterner *si, Span first, Span second);
 Span span_create(SpanInterner *si, int32_t start, int32_t end, int32_t ctx);
 bool span_is_interned(Span *span);
+
 SpanInterner span_create_interner();
 int32_t span_intern(SpanInterner *si, BigSpan *span);
 BigSpan span_get(SpanInterner *si, Span span);

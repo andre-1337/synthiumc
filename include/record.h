@@ -28,6 +28,7 @@ typedef struct StructDecl {
 
 Field record_field_empty();
 Field record_field_create(Ident ident, Type ty);
+
 Fields record_fields_create(SpanInterner *si, Vec fields);
 bool record_fields_get_field_at(Fields *fs, int32_t i, Field *dest);
 char *const record_fields_to_string(Fields *fs, SpanInterner *si);

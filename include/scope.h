@@ -27,6 +27,7 @@ bool scope_bind_in(Scope *s, SpanInterner *si, Ident ident, Ty value);
 bool scope_s_bind_in(Scope *s, int32_t ident_len, char *const ident, Ty value);
 Ty *scope_get_in(Scope *s, SpanInterner *si, Ident *ident);
 Ty *scope_s_get_in(Scope *s, int32_t key_len, char *const key);
+
 ScopeStack scope_empty_stack();
 ScopeStack scope_create_stack(SpanInterner *si);
 void scope_free_stack(ScopeStack *s);
