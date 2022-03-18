@@ -13,7 +13,7 @@ typedef struct File {
 } File;
 
 File file_create(PathBuf path);
-int32_t file_read_to_string(File *s, const char *dest);
+int32_t file_read_to_string(File *f, const char **dest);
 File file_empty();
 const char *file_name_dup(File *f);
 void file_free(File *f);

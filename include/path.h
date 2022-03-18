@@ -15,13 +15,14 @@ typedef struct Path {
 } Path;
 
 typedef struct PathBuf {
-    const char *inner;
+    Path inner;
 } PathBuf;
 
 Path path_empty();
 Path path_create(const char *value, int32_t len);
 bool path_ends_with(Path *p, const char *s);
 int32_t path_from_str(const char *s, Path *p);
+PathBuf path_buf_from(Path path);
 Path path_parent(Path *p);
 int32_t path_canonicalize(Path *p, PathBuf *dest);
 bool path_is_abs(Path *p);
@@ -33,4 +34,4 @@ PathBuf path_create_pathbuf(const char *path);
 PathBuf path_from_path(Path path);
 int32_t path_merge_abs_rel(Path *base, Path *child, PathBuf *dest);
 int32_t path_merge_abs_rel_suffix(Path *base, Path *child, const char *suffix, PathBuf *dest);
-void pathbuf_free(PathBuf *pb);
+void path_free(PathBuf *pb);
