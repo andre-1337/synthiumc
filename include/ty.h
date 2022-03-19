@@ -24,7 +24,7 @@ typedef struct Ty {
     TyTypes kind;
     int32_t width;
     int32_t align;
-    int32_t flags;
+    uint32_t flags;
 } Ty;
 
 typedef struct I32 {
@@ -99,8 +99,8 @@ Mod *ty_as_mod(Ty *t);
 
 Ty *ty_new_placeholder_type(TyTypes kind, int32_t size);
 Ty ty_create_type(TyTypes ty);
-bool is_initialized(Ty *t);
-bool is_scoped(Ty *t);
+bool ty_is_initialized(Ty *t);
+bool ty_is_scoped(Ty *t);
 
 TypeList ty_new_empty_list();
 TypeList ty_create_type_list(Ptrvec types);
