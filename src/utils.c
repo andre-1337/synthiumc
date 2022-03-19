@@ -83,7 +83,7 @@ ErrorCode read_file(const char *path, const char **content) {
     fclose(file);
     *content = buffer;
 
-    return 0;
+    return OK;
 }
 
 uint64_t next_pow_of_2(uint64_t num) {

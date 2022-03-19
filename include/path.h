@@ -1,11 +1,14 @@
 #pragma once
 
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include "error.h"
+#include "utils.h"
 
 #define SYSTEM_SEPARATOR '/'
 
@@ -21,7 +24,7 @@ typedef struct PathBuf {
 Path path_empty();
 Path path_create(const char *value, int32_t len);
 bool path_ends_with(Path *p, const char *s);
-int32_t path_from_str(const char *s, Path *p);
+ErrorCode path_from_str(const char *s, Path *p);
 PathBuf path_buf_from(Path path);
 Path path_parent(Path *p);
 int32_t path_canonicalize(Path *p, PathBuf *dest);
