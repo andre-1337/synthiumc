@@ -186,4 +186,163 @@ bool ty_is_scoped(Ty *t) {
     return flag_get(&t->flags, FLAG_SCOPED);
 }
 
-// TODO : finish porting
+TypeList ty_new_empty_list() {
+    TypeList list = {
+        .types = ptrvec_create()
+    };
+
+    return list;
+}
+
+TypeList ty_create_type_list(Ptrvec types) {
+    TypeList list = {
+        .types = types
+    };
+
+    return list;
+}
+
+Ty *ty_type_at(TypeList *tl, int32_t i) {
+    return (Ty *) ptrvec_get(&tl->types, i);
+}
+
+void ty_type_list_free(TypeList *tl) {
+    int32_t i = 0;
+    while (i < tl->types.len) {
+        ty_type_free(ty_type_at(tl, i));
+        i++;
+    }
+
+    ptrvec_free(&tl->types);
+}
+
+void ty_type_free(Ty *t) {
+    if (t == NULL) {
+        return;
+    }
+
+    if (ty_is_func(t)) {
+        Func *f_ty = ty_as_func(t);
+        ty_type_free(f_ty->ret);
+        ty_type_list_free(&f_ty->params);
+    }
+
+    if (ty_is_struct(t)) {
+        Struct *s_ty = ty_as_struct(t);
+        vec_free(&s_ty->fields);
+    }
+
+    if (ty_is_mod(t)) {
+        Mod *m_ty = ty_as_mod(t);
+        scope_free(&m_ty->scope);
+    }
+
+    free((void *) t);
+}
+
+bool ty_width_was_calculated(Ty *t) {
+    return t->align > 0;
+}
+
+bool ty_fill_width_align(Ty *t) {
+    if (ty_fill_width_align(t)) {
+        return true;
+    }
+
+    int32_t align = 0;
+    int32_t width = WIDTH_UNKNOWN;
+    bool has_placeholders = false;
+
+    if (ty_is_ptr(t)) {
+        width = 8;
+    } else if (ty_is_i32(t)) {
+        width = 4;
+    } else if (ty_is_string(t)) {
+        width = 8;
+    } else if (ty_is_struct(t)) {
+        Struct *s_ty = ty_as_struct(t);
+        int32_t max_align = align;
+        int32_t width_sum = 0;
+        int32_t i = 0;
+
+        while (i < s_ty->fields.len) {
+            StructField *f = ty_field_at(s_ty, i);
+            bool is_placeholder = flag_get(&f->ty->flags, FLAG_PLACEHOLDER);
+
+            if (is_placeholder) {
+                has_placeholders = true;
+            }
+
+            if (f != NULL && !is_placeholder) {
+                int32_t a = f->ty->align;
+                if (a > max_align) {
+                    max_align = a;
+                }
+
+                int32_t w = f->ty->width;
+                width_sum += w;
+            }
+
+            i++;
+        }
+
+        width = width_sum;
+        align = max_align;
+    }
+
+    if (has_placeholders) {
+        return false;
+    }
+
+    if (width != WIDTH_UNKNOWN) {
+        t->width = width;
+
+        if (align == 0) {
+            align = width;
+        }
+        
+        t->align = align;
+        flag_unset(&t->flags, FLAG_PLACEHOLDER);
+
+        return true;
+    }
+
+    return false;
+}
+
+const char *ty_to_string(Ty *t, SpanInterner *si) {
+    if (t == NULL) {
+        return NULL;
+    }
+
+    if (ty_is_i32(t)) {
+        return strdup("i32");
+    }
+
+    if (ty_is_string(t)) {
+        return strdup("string");
+    }
+
+    if (ty_is_func(t)) {
+        char *name = "name";
+        const char *s = fmt_str("fn %s(...): ...", name);
+        return s;
+    }
+
+    if (ty_is_mod(t)) {
+        return strdup("mod");
+    }
+
+    return NULL;
+}
+
+Ty *ty_clone(Ty *t) {
+    if (t == NULL) {
+        return NULL;
+    }
+
+    void *nt = malloc(sizeof(Ty));
+    memcpy(nt, (void *) t, sizeof(Ty));
+
+    return (Ty *) nt;
+}
