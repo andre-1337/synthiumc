@@ -24,7 +24,7 @@ const char *source_code(SourceFile *sf) {
 int32_t source_read(PathBuf pb, SourceFile *sf) {
     File file = file_create(pb);
     const char *s = NULL;
-    int32_t res = file_read_to_string(&file, s);
+    int32_t res = file_read_to_string(&file, &s);
 
     if (res != 0) return res;
 
