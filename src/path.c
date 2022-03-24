@@ -78,7 +78,7 @@ int32_t path_canonicalize(Path *p, PathBuf *dest) {
 }
 
 bool path_is_abs(Path *p) {
-    return *p->inner == SYSTEM_SEPARATOR || *p->inner == '$';
+    return *p->inner == SYSTEM_SEPARATOR || *p->inner == '~';
 }
 
 bool path_is_root(Path *p) {
