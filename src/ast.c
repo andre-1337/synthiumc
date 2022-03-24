@@ -1,6 +1,6 @@
 #include "../include/ast.h"
 
-static inline Stmt create_tag(StmtType type) {
+static inline Stmt create_stmt_tag(StmtType type) {
     Stmt stmt = {
         .tag = type
     };
@@ -10,7 +10,7 @@ static inline Stmt create_tag(StmtType type) {
 
 Stmt *ast_new_expr_stmt(Expr *e) {
     ExprStmt *expr_stmt = (ExprStmt *) malloc(sizeof(ExprStmt));
-    expr_stmt->s = create_tag(STMT_EXPR);
+    expr_stmt->s = create_stmt_tag(STMT_EXPR);
     expr_stmt->expr = e;
 
     Stmt *stmt = (Stmt *) expr_stmt;
@@ -28,7 +28,7 @@ ExprStmt *ast_as_expr_stmt(Stmt *s) {
 
 Stmt *ast_new_delete_stmt(Expr *e) {
     DeleteStmt *delete_stmt = (DeleteStmt *) malloc(sizeof(DeleteStmt));
-    delete_stmt->s = create_tag(STMT_DELETE);
+    delete_stmt->s = create_stmt_tag(STMT_DELETE);
     delete_stmt->expr = e;
 
     Stmt *stmt = (Stmt *) delete_stmt;
@@ -46,7 +46,7 @@ DeleteStmt *ast_as_delete_stmt(Stmt *s) {
 
 Stmt *ast_new_return_stmt(Expr *e) {
     ReturnStmt *return_stmt = (ReturnStmt *) malloc(sizeof(ReturnStmt));
-    return_stmt->s = create_tag(STMT_RETURN);
+    return_stmt->s = create_stmt_tag(STMT_RETURN);
     return_stmt->expr = e;
 
     Stmt *stmt = (Stmt *) return_stmt;
@@ -64,7 +64,7 @@ ReturnStmt *ast_as_return_stmt(Stmt *s) {
 
 Stmt *ast_new_while_stmt(Expr *condition, BlockStmt *block) {
     WhileStmt *while_stmt = (WhileStmt *) malloc(sizeof(WhileStmt));
-    while_stmt->s = create_tag(STMT_WHILE);
+    while_stmt->s = create_stmt_tag(STMT_WHILE);
     while_stmt->cond = condition;
     while_stmt->block = block;
 
@@ -83,7 +83,7 @@ WhileStmt *ast_as_while_stmt(Stmt *s) {
 
 Stmt *ast_new_if_stmt(Expr *condition, BlockStmt *block, Stmt *else_stmt) {
     IfStmt *if_stmt = (IfStmt *) malloc(sizeof(IfStmt));
-    if_stmt->s = create_tag(STMT_IF);
+    if_stmt->s = create_stmt_tag(STMT_IF);
     if_stmt->condition = condition;
     if_stmt->block = block;
     if_stmt->else_stmt = else_stmt;
@@ -119,7 +119,7 @@ ElseType ast_else_type(IfStmt *s) {
 
 Stmt *ast_new_block_stmt(Ptrvec statements) {
     BlockStmt *block_stmt = (BlockStmt *) malloc(sizeof(BlockStmt));
-    block_stmt->s = create_tag(STMT_BLOCK);
+    block_stmt->s = create_stmt_tag(STMT_BLOCK);
     block_stmt->stmts = statements;
 
     Stmt *stmt = (Stmt *) block_stmt;
@@ -137,7 +137,7 @@ BlockStmt *ast_as_block_stmt(Stmt *s) {
 
 Stmt *ast_new_func_decl_stmt(Token ident, ParamList params, Type ret_ty, bool is_extern, BlockStmt *block) {
     FuncDeclStmt *func_decl_stmt = (FuncDeclStmt *) malloc(sizeof(FuncDeclStmt));
-    func_decl_stmt->s = create_tag(STMT_FUNC_DECL);
+    func_decl_stmt->s = create_stmt_tag(STMT_FUNC_DECL);
     func_decl_stmt->decl = func_create(ident, params, ret_ty, is_extern);
     func_decl_stmt->block = block;
 
@@ -156,7 +156,7 @@ FuncDeclStmt *ast_as_func_decl_stmt(Stmt *s) {
 
 Stmt *ast_new_struct_decl_stmt(SpanInterner *si, Ident name, Vec fields) {
     StructDeclStmt *struct_decl_stmt = (StructDeclStmt *) malloc(sizeof(StructDeclStmt));
-    struct_decl_stmt->s = create_tag(STMT_STRUCT_DECL);
+    struct_decl_stmt->s = create_stmt_tag(STMT_STRUCT_DECL);
     struct_decl_stmt->decl = record_struct_create(si, name, fields);
 
     Stmt *stmt = (Stmt *) struct_decl_stmt;
@@ -174,7 +174,7 @@ StructDeclStmt *ast_as_struct_decl_stmt(Stmt *s) {
 
 Stmt *ast_new_import_stmt(Span span, const char *path) {
     ImportStmt *import_stmt = (ImportStmt *) malloc(sizeof(ImportStmt));
-    import_stmt->s = create_tag(STMT_IMPORT);
+    import_stmt->s = create_stmt_tag(STMT_IMPORT);
     import_stmt->mod = ident_from_str(span, path);
 
     Stmt *stmt = (Stmt *) import_stmt;
@@ -192,7 +192,7 @@ ImportStmt *ast_as_import_stmt(Stmt *s) {
 
 Stmt *ast_new_let_stmt(Token ident, Type ty, Expr *value) {
     LetStmt *let_stmt = (LetStmt *) malloc(sizeof(LetStmt));
-    let_stmt->s = create_tag(STMT_LET);
+    let_stmt->s = create_stmt_tag(STMT_LET);
     let_stmt->value = value;
     let_stmt->ident = ident_create(ident);
     let_stmt->ty = ty;
@@ -262,4 +262,33 @@ void ast_stmt_free(Stmt *s) {
     }
 
     free((void *) s);
+}
+
+static inline Expr create_expr_tag(ExprType type, Span span) {
+    Expr expr = {
+        .tag = type,
+        .ty = NULL,
+        .span = span
+    };
+
+    return expr;
+}
+
+Expr *ast_new_access_expr(Span span, Expr *left, Expr *right) {
+    AccessExpr *access_expr = (AccessExpr *) malloc(sizeof(AccessExpr));
+    access_expr->e = create_expr_tag(EXPR_ACCESS, span);
+    access_expr->left = left;
+    access_expr->right = right;
+
+    Expr *expr = (Expr *) access_expr;
+
+    return expr;
+}
+
+bool ast_is_access_expr(Expr *e) {
+    return e->tag == EXPR_ACCESS;
+}
+
+AccessExpr *ast_as_access_expr(Expr *e) {
+    return (AccessExpr *) e;
 }
