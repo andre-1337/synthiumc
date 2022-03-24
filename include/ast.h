@@ -78,7 +78,7 @@ typedef struct Stmt {
 
 typedef struct Expr {
     ExprType tag;
-    Ty *ty;
+    struct Ty *ty;
     Span span;
 } Expr;
 
