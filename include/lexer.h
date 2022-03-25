@@ -154,8 +154,8 @@ typedef struct Lexer {
 
 const char *lexer_get_str(int32_t index, size_t len, const char **array);
 const char *lexer_tok2str(TokenType type);
-const char *lexer_unary2str(TokenType op);
-const char *lexer_binary2str(TokenType type);
+const char *lexer_unary2str(int32_t op);
+const char *lexer_binary2str(int32_t type);
 Token lexer_empty_token();
 bool lexer_is_err(Token *token);
 Lexer lexer_create(SourceFile src, SpanInterner *si, int32_t ctx);

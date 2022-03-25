@@ -14,6 +14,7 @@
 #include "ptrvec.h"
 
 struct Ty;
+struct Token;
 
 typedef enum ExprType : int32_t {
     EXPR_INT = 1,
@@ -244,7 +245,7 @@ Stmt *ast_new_block_stmt(Ptrvec statements);
 bool ast_is_block_stmt(Stmt *s);
 BlockStmt *ast_as_block_stmt(Stmt *s);
 
-Stmt *ast_new_func_decl_stmt(Token ident, ParamList params, Type ret_ty, bool is_extern, BlockStmt *block);
+Stmt *ast_new_func_decl_stmt(struct Token ident, ParamList params, Type ret_ty, bool is_extern, BlockStmt *block);
 bool ast_is_func_decl_stmt(Stmt *s);
 FuncDeclStmt *ast_as_func_decl_stmt(Stmt *s);
 
@@ -256,7 +257,7 @@ Stmt *ast_new_import_stmt(Span span, const char *path);
 bool ast_is_import_stmt(Stmt *s);
 ImportStmt *ast_as_import_stmt(Stmt *s);
 
-Stmt *ast_new_let_stmt(Token ident, Type ty, Expr *value);
+Stmt *ast_new_let_stmt(struct Token ident, Type ty, Expr *value);
 bool ast_is_let_stmt(Stmt *s);
 LetStmt *ast_as_let_stmt(Stmt *s);
 
@@ -287,7 +288,7 @@ Expr *ast_new_assign_expr(Span span, Expr *left, Expr *right);
 bool ast_is_assign_expr(Expr *e);
 AssignExpr *ast_as_assign_expr(Expr *e);
 
-Expr *ast_new_ident_expr(Token ident);
+Expr *ast_new_ident_expr(struct Token ident);
 bool ast_is_ident_expr(Expr *e);
 IdentExpr *ast_as_ident_expr(Expr *e);
 
@@ -317,7 +318,7 @@ const char *ast_expr_to_string(Expr *e, SpanInterner *si);
 
 ArgList ast_create_arg_list();
 int32_t ast_num_args(ArgList *al);
-Expr *ast_get_arg_al(ArgList *al, int32_t i);
+Expr *ast_get_arg_at(ArgList *al, int32_t i);
 void ast_push_arg(ArgList *al, Expr *arg);
 void ast_free_al(ArgList *al);
 const char *ast_arg_list_to_string(ArgList *al, SpanInterner *si);
@@ -326,7 +327,7 @@ Init ast_create_init(Ident ident, Expr *expr);
 Init ast_empty_init();
 InitList ast_create_init_list();
 int32_t ast_num_inits(InitList *il);
-Expr *ast_get_init_expr(InitList *il, int32_t i);
+Expr *ast_get_init_expr_at(InitList *il, int32_t i);
 bool ast_get_init_at(InitList *il, int32_t i, Init *dest);
 void ast_push_init(InitList *il, Init init);
 void ast_free_il(InitList *il);
