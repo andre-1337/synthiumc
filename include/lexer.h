@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 #include "span.h"
+#include "utils.h"
 #include "source.h"
 
 typedef enum TokenType : int32_t {
@@ -183,5 +184,5 @@ Token lexer_create_token(Lexer *l, TokenType ty, const char *start, const char *
 Token lexer_create_token_from_span(Lexer *l, TokenType ty, const char *start, Span span);
 Token lexer_token_from_start(Lexer *l, TokenType ty);
 const char *lexer_token_ty_to_static_string(TokenType ty);
-bool lexer_token_to_string(Token *token, SpanInterner *si, const char *dest);
+bool lexer_token_to_string(Token *token, SpanInterner *si, char **dest);
 int32_t lexer_token_len(Token *token, SpanInterner *si);
