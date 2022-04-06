@@ -174,7 +174,7 @@ Token lexer_lex_ident(Lexer *l);
 Token lexer_lex_num(Lexer *l);
 Token lexer_lex_string(Lexer *l);
 Token lexer_lex_char(Lexer *l);
-int32_t lexer_check_keyword(Lexer *l, int32_t start, int32_t rest_len, const char *rest, TokenType ty);
+TokenType lexer_check_keyword(Lexer *l, int32_t start, int32_t rest_len, const char *rest, TokenType ty);
 int32_t lexer_ident_type(Lexer *l);
 void lexer_skip_ws(Lexer *l);
 bool lexer_at_end(Lexer *l);

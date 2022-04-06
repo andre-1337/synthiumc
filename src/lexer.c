@@ -95,4 +95,48 @@ Token lexer_next_token(Lexer *l) {
     return lexer_get_next_token(l);
 }
 
-// TODO : continue porting the lexer
+int32_t lexer_current(Lexer *l) {
+    int32_t c = 0;
+    int32_t read_bytes = lexer_current_pos(l);
+
+    read_char(l->current, l->source_len - read_bytes, &c);
+
+    return c;
+}
+
+bool lexer_is_num(int32_t ch) {
+    return (ch >= chr2int('0') && ch <= chr2int('9'));
+}
+
+bool lexer_is_letter(int32_t ch) {
+    return (ch >= chr2int('a') && ch <= chr2int('z')) || (ch >= chr2int('A') && ch <= chr2int('Z'));
+}
+
+TokenType lexer_check_keyword(Lexer *l, int32_t start, int32_t rest_len, const char *rest, TokenType ty) {
+    if (l->current - l->start == start + rest_len) {
+        if (memcmp((void *) l->start + start, (void *) rest, rest_len) == 0) {
+            return ty;
+        }
+    }
+
+    return TOKEN_IDENT;
+}
+
+int32_t lexer_ident_type(Lexer *l) {
+    int64_t bytes_until = l->start - l->source.code;
+    int32_t start = 0;
+    int32_t len = read_char(l->start, l->source_len - bytes_until, &start);
+
+    if (start == chr2int('l')) {
+        return lexer_check_keyword(l, 1, 2, "et", TOKEN_LET);
+    } else if (start == chr2int('i') && l->current - l->start > 1) {
+        int32_t next = 0;
+        read_char(l->start + len, l->source_len - bytes_until - len, &next);
+
+        if (next == chr2int('f')) {
+            return lexer_check_keyword(l, 2, 0, "", TOKEN_IF);
+        } else if (next == chr2int('m')) {
+            return lexer_check_keyword(l, 2, 4, "port", TOKEN_IMPORT);
+        }
+    } // TODO
+}
