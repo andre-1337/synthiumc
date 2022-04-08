@@ -279,5 +279,154 @@ Token lexer_token_from_start(Lexer *l, TokenType ty) {
     return lexer_create_token(l, ty, l->start, l->current);
 }
 
-Token lexer_get_next_token(Lexer *l) {}
+Token lexer_get_next_token(Lexer *l) {
+    if (lexer_at_end(l)) {
+        int32_t pos = lexer_current_pos(l);
+        Token token = {
+            .ty = TOKEN_EOF,
+            .span = lexer_create_span(l, pos, pos),
+            .lexeme = NULL
+        };
 
+        return token;
+    }
+
+    l->start = l->current;
+    int32_t c = lexer_advance(l);
+
+    if (lexer_is_num(c)) {
+        return lexer_lex_num(l);
+    }
+
+    if (lexer_is_letter(c)) {
+        return lexer_lex_ident(l);
+    }
+
+    if (c == chr2int('"')) {
+        return lexer_lex_string(l);
+    }
+
+    if (c == chr2int(*"'")) {
+        return lexer_lex_char(l);
+    }
+
+    if (c == chr2int(';')) {
+        return lexer_token_from_start(l, TOKEN_SEMI);
+    }
+
+    if (c == chr2int(',')) {
+        return lexer_token_from_start(l, TOKEN_COMMA);
+    }
+
+    if (c == chr2int(':')) {
+        return lexer_token_from_start(l, TOKEN_COLON);
+    }
+
+    if (c == chr2int('+')) {
+        return lexer_token_from_start(l, TOKEN_PLUS);
+    }
+
+    if (c == chr2int('-')) {
+        return lexer_token_from_start(l, TOKEN_MINUS);
+    }
+
+    if (c == chr2int('*')) {
+        return lexer_token_from_start(l, TOKEN_STAR);
+    }
+
+    if (c == chr2int('(')) {
+        return lexer_token_from_start(l, TOKEN_LPAREN);
+    }
+    
+    if (c == chr2int(')')) {
+        return lexer_token_from_start(l, TOKEN_RPAREN);
+    }
+
+    if (c == chr2int('{')) {
+        return lexer_token_from_start(l, TOKEN_LBRACE);
+    }
+
+    if (c == chr2int('}')) {
+        return lexer_token_from_start(l, TOKEN_RBRACE);
+    }
+
+    if (c == chr2int('%')) {
+        return lexer_token_from_start(l, TOKEN_PERCENT);
+    }
+
+    if (c == chr2int('.')) {
+        if (memcmp((void *) l->start, (void *) "...", 3) == 0) {
+            lexer_advance(l);
+            lexer_advance(l);
+
+            return lexer_token_from_start(l, TOKEN_TRIPLE_DOT);
+        }
+
+        return lexer_token_from_start(l, TOKEN_DOT);
+    }
+
+    if (c == chr2int('/')) {
+        if (lexer_current(l) == chr2int('/')) {
+            lexer_skip_until(l, chr2int('\n'));
+            return lexer_next_token(l);
+        }
+
+        return lexer_token_from_start(l, TOKEN_SLASH);
+    }
+
+    if (c == chr2int('<')) {
+        if (lexer_current(l) == chr2int('=')) {
+            lexer_advance(l);
+            return lexer_token_from_start(l, TOKEN_SMALLER_EQ);
+        }
+
+        return lexer_token_from_start(l, TOKEN_SMALLER);
+    }
+
+    if (c == chr2int('>')) {
+        if (lexer_current(l) == chr2int('=')) {
+            lexer_advance(l);
+            return lexer_token_from_start(l, TOKEN_GREATER_EQ);
+        }
+
+        return lexer_token_from_start(l, TOKEN_GREATER);
+    }
+
+    if (c == chr2int('&')) {
+        if (lexer_current(l) == chr2int('&')) {
+            lexer_advance(l);
+            return lexer_token_from_start(l, TOKEN_DOUBLE_AMPERSAND);
+        }
+
+        return lexer_token_from_start(l, TOKEN_AMPERSAND);
+    }
+
+    if (c == chr2int('|')) {
+        if (lexer_current(l) == chr2int('|')) {
+            lexer_advance(l);
+            return lexer_token_from_start(l, TOKEN_DOUBLE_PIPE);
+        }
+
+        return lexer_token_from_start(l, TOKEN_PIPE);
+    }
+
+    if (c == chr2int('=')) {
+        if (lexer_current(l) == chr2int('=')) {
+            lexer_advance(l);
+            return lexer_token_from_start(l, TOKEN_DOUBLE_EQ);
+        }
+
+        return lexer_token_from_start(l, TOKEN_EQ);
+    }
+
+    if (c == chr2int('!')) {
+        if (lexer_current(l) == chr2int('=')) {
+            lexer_advance(l);
+            return lexer_token_from_start(l, TOKEN_BANG_EQ);
+        }
+
+        return lexer_token_from_start(l, TOKEN_BANG);
+    }
+
+    return lexer_token_from_start(l, TOKEN_UNKNOWN_ERR);
+}
