@@ -228,3 +228,177 @@ Stmt *parser_statement(Parser *p) {
     return s;
 }
 
+bool parser_parse_statement(Parser *p, Stmt **dest) {
+    Token peek = parser_peek(p);
+
+    switch (peek.ty) {
+        case TOKEN_FN: {
+            *dest = parser_parse_func_def(p, false);
+            return false;
+        }
+
+        case TOKEN_IF: {
+            *dest = parser_parse_if_stmt(p);
+            return false;
+        }
+
+        case TOKEN_WHILE: {
+            *dest = parser_parse_while_stmt(p);
+            return false;
+        }
+
+        case TOKEN_TYPE: {
+            *dest = parser_parse_type_stmt(p);
+            return false;
+        }
+
+        case TOKEN_EXTERN: {
+            parser_consume(p, TOKEN_EXTERN);
+            *dest = parser_parse_func_def(p, true);
+            return true;
+        }
+
+        case TOKEN_DELETE: {
+            *dest = parser_parse_delete_stmt(p);
+            return true;
+        }
+
+        case TOKEN_RETURN: {
+            *dest = parser_parse_return_stmt(p);
+            return true;
+        }
+
+        case TOKEN_LET: {
+            *dest = parser_parse_let_stmt(p);
+            return true;
+        }
+
+        case TOKEN_IMPORT: {
+            *dest = parser_parse_import_stmt(p);
+            return true;
+        }
+
+        default: {
+            Expr *expr = parser_expression(p, false);
+            if (expr == NULL) {
+                *dest = NULL;
+                return true;
+            }
+
+            *dest = ast_new_expr_stmt(expr);
+            return true;
+        }
+    }
+}
+
+Stmt *parser_parse_func_def(Parser *p, bool is_extern) {
+    CONSUME_OR_NULL(TOKEN_FN);
+
+    Token ident = lexer_empty_token();
+    if (!parser_consume_ident(p, &ident, false)) {
+        return NULL;
+    }
+
+    CONSUME_OR_NULL(TOKEN_LPAREN);
+
+    Vec params = parser_parse_param_list(p, is_extern);
+    ParamList param_list = func_pl_from_vec(params);
+
+    if (!parser_consume(p, TOKEN_COLON)) {
+        func_pl_free(&param_list);
+        return NULL;
+    }
+
+    Type ret_ty = type_empty();
+    if (!parser_consume_type(p, &ret_ty)) {
+        func_pl_free(&param_list);
+        return NULL;
+    }
+
+    Stmt *block = NULL;
+    if (!is_extern) {
+        block = parser_parse_block(p);
+
+        if (block == NULL) {
+            func_pl_free(&param_list);
+            return NULL;
+        }
+    }
+
+    return ast_new_func_decl_stmt(ident, param_list, ret_ty, is_extern, ast_as_block_stmt(block));
+}
+
+Stmt *parser_parse_if_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_IF);
+
+    Token peek = parser_peek(p);
+    Expr *condition = parser_expression(p, true);
+
+    if (condition == NULL) {
+        ParseError error = parser_create_consume_error_text(p, &peek, "condition");
+        parser_push_err(p, error);
+
+        return NULL;
+    }
+
+    Stmt *block = parser_parse_block(p);
+    if (block == NULL) {
+        ast_expr_free(condition);
+        return NULL;
+    }
+
+    Stmt *if_stmt = ast_new_if_stmt(condition, ast_as_block_stmt(block), NULL);
+    if (parser_peek(p).ty != TOKEN_ELSE) {
+        return if_stmt;
+    }
+
+    parser_consume(p, TOKEN_ELSE);
+
+    Stmt *else_stmt = NULL;
+    peek = parser_peek(p);
+
+    switch (peek.ty) {
+        case TOKEN_IF: {
+            else_stmt = parser_parse_if_stmt(p);
+        }
+
+        case TOKEN_LBRACE: {
+            else_stmt = parser_parse_block(p);
+        }
+
+        default: {
+            ParseError error = parser_create_consume_error_text(p, &peek, "either 'if' or '{' after 'else'");
+            parser_push_err(p, error);
+        }
+    }
+
+    if (else_stmt == NULL) {
+        ast_stmt_free(if_stmt);
+        return NULL;
+    }
+
+    ast_as_if_stmt(if_stmt)->else_stmt = else_stmt;
+    return if_stmt;
+}
+
+Stmt *parser_parse_while_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_WHILE);
+
+    Token peek = parser_peek(p);
+    Expr *condition = parser_expression(p, true);
+
+    if (condition == NULL) {
+        ParseError error = parser_create_consume_error_text(p, &peek, "condition");
+        parser_push_err(p, error);
+
+        return NULL;
+    }
+
+    Stmt *block = parser_parse_block(p);
+    if (block == NULL) {
+        ast_expr_free(condition);
+        return NULL;
+    }
+
+    return ast_new_while_stmt(condition, ast_as_block_stmt(block));
+}

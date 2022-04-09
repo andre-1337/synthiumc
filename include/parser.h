@@ -15,7 +15,7 @@
 #include "source.h"
 #include "precedence.h"
 
-#define CONSUME_OR_NULL(ty) if (!consume(p, ty)) { return NULL; }
+#define CONSUME_OR_NULL(ty) if (!parser_consume(p, ty)) { return NULL; }
 #define CHECK_EXPR_OR_NULL(name, expr) Expr *name = expr; if (name == NULL) { return NULL; }
 #define CHECK_ASSIGN_OR_NULL(name, expr) name = expr; if (name == NULL) { return NULL; }
 
