@@ -25,7 +25,7 @@ typedef struct ModuleMap {
     Map mod_paths;
 } ModuleMap;
 
-Module mod_create(Path p);
+Module *mod_create(Path p);
 Ty *mod_s_lookup(Module *m, int32_t key_len, const char *key);
 Stmt *mod_get_stmt_at(Module *m, int32_t i);
 void mod_set_stmt_at(Module *m, int32_t i, Stmt *s);

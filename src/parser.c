@@ -184,3 +184,47 @@ bool parser_consume_type(Parser *p, Type *dest) {
 Token parser_peek(Parser *p) {
     return lexer_peek(&p->lexer);
 }
+
+Module *parser_parse(Parser *p) {
+    Path path = p->lexer.source.file.path.inner;
+    Module *mod = mod_create(path);
+    
+    while (parser_peek(p).ty != TOKEN_EOF) {
+        Stmt *s = parser_statement(p);
+        if (s != NULL) {
+            mod_push_stmt(mod, s);
+        }
+    }
+
+    return mod;
+}
+
+Stmt *parser_statement(Parser *p) {
+    int32_t num_errs = parser_num_errs(p);
+    int32_t start = lexer_current_pos(&p->lexer);
+    Stmt *s = NULL;
+    bool consume_semi = parser_parse_statement(p, &s);
+
+    if (s == NULL) {
+        int32_t end = parser_sync(p);
+
+        if (num_errs == parser_num_errs(p)) {
+            ParseError error = parser_create_statement_error(p, start, end);
+            parser_push_err(p, error);
+        }
+
+        return NULL;
+    }
+
+    if (consume_semi) {
+        if (!parser_consume(p, TOKEN_SEMI)) {
+            parser_sync(p);
+            ast_stmt_free(s);
+
+            return NULL;
+        }
+    }
+
+    return s;
+}
+

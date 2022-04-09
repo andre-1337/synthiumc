@@ -1,15 +1,15 @@
 #include "../include/mod.h"
 
-Module mod_create(Path p) {
-    Module module = {
-        .statements = ptrvec_create(),
-        .path = p,
-        .imports = vec_create(sizeof(int32_t)),
-        .functions = vec_create(sizeof(int32_t)),
-        .structs = vec_create(sizeof(int32_t)),
-        .ty = NULL,
-        .idx = -1
-    };
+Module *mod_create(Path p) {
+    Module *module = (Module *) malloc(sizeof(Module));
+
+    module->statements = ptrvec_create();
+    module->path = p;
+    module->imports = vec_create(sizeof(int32_t));
+    module->functions = vec_create(sizeof(int32_t));
+    module->structs = vec_create(sizeof(int32_t));
+    module->ty = NULL;
+    module->idx = -1;
 
     return module;
 }
