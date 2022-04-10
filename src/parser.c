@@ -402,3 +402,264 @@ Stmt *parser_parse_while_stmt(Parser *p) {
 
     return ast_new_while_stmt(condition, ast_as_block_stmt(block));
 }
+
+Stmt *parser_parse_type_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_TYPE);
+
+    Token ident = lexer_empty_token();
+    if (!parser_consume_ident(p, &ident, false)) {
+        return NULL;
+    }
+
+    CONSUME_OR_NULL(TOKEN_STRUCT);
+    CONSUME_OR_NULL(TOKEN_LBRACE);
+
+    Vec fields = parser_parse_field_list(p);
+    if (fields.elem_size == 0) {
+        vec_free(&fields);
+        return NULL;
+    }
+
+    return ast_new_struct_decl_stmt(p->lexer.span_interner, ident_create(ident), fields);
+}
+
+Stmt *parser_parse_delete_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_DELETE);
+    CHECK_EXPR_OR_NULL(expr, parser_expression(p, false));
+
+    return ast_new_delete_stmt(expr);
+}
+
+Stmt *parser_parse_return_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_DELETE);
+    
+    if (parser_peek(p).ty == TOKEN_SEMI) {
+        return ast_new_return_stmt(NULL);
+    }
+
+    CHECK_EXPR_OR_NULL(expr, parser_expression(p, false));
+
+    return ast_new_return_stmt(expr);
+}
+
+Stmt *parser_parse_let_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_LET);
+
+    Token ident = lexer_empty_token();
+    if (!parser_consume_ident(p, &ident, false)) {
+        return NULL;
+    }
+
+    Type ty = type_empty();
+    if (parser_peek(p).ty == TOKEN_COLON) {
+        CONSUME_OR_NULL(TOKEN_COLON);
+
+        if (!parser_consume_type(p, &ty)) {
+            return NULL;
+        }
+    }
+
+    CONSUME_OR_NULL(TOKEN_EQ);
+    CHECK_EXPR_OR_NULL(expr, parser_expression(p, false));
+
+    return ast_new_let_stmt(ident, ty, expr);
+}
+
+Stmt *parser_parse_import_stmt(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_IMPORT);
+
+    Token mod_path = lexer_empty_token();
+    if (!parser_consume_token(p, TOKEN_STRING, &mod_path)) {
+        return NULL;
+    }
+
+    return ast_new_import_stmt(mod_path.span, mod_path.lexeme);
+}
+
+Stmt *parser_parse_block(Parser *p) {
+    CONSUME_OR_NULL(TOKEN_LBRACE);
+
+    Ptrvec statements = ptrvec_create();
+    Token peek = parser_peek(p);
+
+    while (peek.ty != TOKEN_EOF && peek.ty != TOKEN_RBRACE) {
+        Stmt *s = parser_statement(p);
+        if (s == NULL) {
+            parser_free_statements(&statements);
+            return NULL;
+        }
+
+        ptrvec_push_ptr(&statements, (void *) s);
+        peek = parser_peek(p);
+    }
+
+    if (!parser_consume(p, TOKEN_RBRACE)) {
+        parser_free_statements(&statements);
+        return NULL;
+    }
+
+    return ast_new_block_stmt(statements);
+}
+
+Vec parser_parse_field_list(Parser *p) {
+    #define BAIL() vec_free(&fields); return vec_create(0)
+
+    Vec fields = vec_create(sizeof(Fields));
+    Token peek = parser_peek(p);
+
+    while (peek.ty != TOKEN_EOF && peek.ty != TOKEN_RBRACE) {
+        Token ident1 = lexer_empty_token();
+        if (!parser_consume_ident(p, &ident1, false)) {
+            BAIL();
+        }
+
+        Ident ident2 = ident_create(ident1);
+
+        if (!parser_consume(p, TOKEN_COLON)) {
+            BAIL();
+        }
+
+        Type ty = type_empty();
+        if (!parser_consume_type(p, &ty)) {
+            BAIL();
+        }
+
+        Field field = record_field_create(ident2, ty);
+        vec_push(&fields, (void *) &field);
+
+        peek = parser_peek(p);
+
+        if (peek.ty == TOKEN_COMMA) {
+            parser_consume(p, TOKEN_COMMA);
+        }
+    }
+
+    if (!parser_consume(p, TOKEN_RBRACE)) {
+        BAIL();
+    }
+
+    return fields;
+
+    #undef BAIL
+}
+
+Vec parser_parse_param_list(Parser *p, bool allow_varargs) {
+    #define BAIL() vec_free(&params); return vec_create(0)
+
+    Vec params = vec_create(sizeof(Param));
+    Token peek = parser_peek(p);
+
+    while (peek.ty != TOKEN_EOF && peek.ty != TOKEN_RPAREN) {
+        Token ident1 = lexer_empty_token();
+        Type ty = type_empty();
+
+        if (allow_varargs && parser_peek(p).ty == TOKEN_TRIPLE_DOT) {
+            parser_consume_token(p, TOKEN_TRIPLE_DOT, &ident1);
+        } else {
+            ident1 = lexer_empty_token();
+            if (!parser_consume_ident(p, &ident1, false)) {
+                BAIL();
+            }
+
+            if (!parser_consume(p, TOKEN_COLON)) {
+                BAIL();
+            }
+
+            if (!parser_consume_type(p, &ty)) {
+                BAIL();
+            }
+        }
+
+        Ident ident2 = ident_create(ident1);
+        Param param = param_create(ident2, ty);
+
+        vec_push(&params, (void *) &param);
+        peek = parser_peek(p);
+
+        if (peek.ty == TOKEN_COMMA) {
+            parser_consume(p, TOKEN_COMMA);
+        }
+    }
+
+    if (!parser_consume(p, TOKEN_RPAREN)) {
+        BAIL();
+    }
+
+    return params;
+
+    #undef BAIL
+}
+
+ArgList parser_parse_arg_list(Parser *p) {
+    #define BAIL() ast_free_al(&args); return ast_create_arg_list()
+
+    ArgList args = ast_create_arg_list();
+    Token peek = parser_peek(p);
+
+    while (peek.ty != TOKEN_EOF && peek.ty != TOKEN_RPAREN) {
+        Expr *arg = parser_expression(p, false);
+        if (arg == NULL) {
+            BAIL();
+        }
+
+        ast_push_arg(&args, arg);
+        peek = parser_peek(p);
+
+
+        if (peek.ty == TOKEN_COMMA) {
+            parser_consume(p, TOKEN_COMMA);
+        }
+    }
+
+    return args;
+
+    #undef BAIL
+}
+
+InitList parser_parse_init_list(Parser *p) {
+    #define BAIL() ast_free_il(&inits); return ast_create_init_list()
+
+    InitList inits = ast_create_init_list();
+    Token peek = parser_peek(p);
+
+    while (peek.ty != TOKEN_EOF && peek.ty != TOKEN_RBRACE) {
+        Token ident = lexer_empty_token();
+        if (!parser_consume_ident(p, &ident, false)) {
+            BAIL();
+        }
+
+        if (!parser_consume(p, TOKEN_COLON)) {
+            BAIL();
+        }
+
+        Expr *val = parser_expression(p, false);
+        if (val == NULL) {
+            BAIL();
+        }
+
+        Init init = ast_create_init(ident_create(ident), val);
+        
+        ast_push_init(&inits, init);
+        peek = parser_peek(p);
+
+        if (peek.ty == TOKEN_COMMA) {
+            parser_consume(p, TOKEN_COMMA);
+        }
+    }
+
+    return inits;
+
+    #undef BAIL
+}
+
+void parser_free_statements(Ptrvec *statements) {
+    int32_t i = 0;
+    while (i < statements->len) {
+        Stmt *s = (Stmt *) ptrvec_get(statements, i);
+        ast_stmt_free(s);
+
+        i++;
+    }
+
+    ptrvec_free(statements);
+}
