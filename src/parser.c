@@ -719,3 +719,124 @@ bool parser_next_higher_precedence(Parser *p, Precedence precedence, bool no_str
     return precedence_get(t.ty) > precedence;
 }
 
+Expr *parser_prefix(Parser *p, bool no_struct) {
+    #define UNARY(tk, typ)                                                                      \
+        if (token.ty == (tk)) {                                                                \
+            CHECK_EXPR_OR_NULL(expr, parser_parse_expression(p, PRECEDENCE_UNARY, no_struct)); \
+            Span span = span_merge(p->lexer.span_interner, token.span, expr->span);            \
+            return ast_new_unary_expr(span, (typ), expr);                                       \
+        } 0
+
+    Token token = lexer_empty_token();
+    if (!parser_advance(p, &token)) {
+        return NULL;
+    }
+
+    switch (token.ty) {
+        case TOKEN_INT: {
+            return ast_new_int_expr(token.span, token.lexeme);
+        }
+
+        case TOKEN_STRING: {
+            return ast_new_string_expr(token.span, token.lexeme);
+        }
+
+        case TOKEN_CHAR: {
+            return ast_new_char_expr(token.span, token.lexeme);
+        }
+
+        case TOKEN_IDENT: {
+            return ast_new_ident_expr(token);
+        }
+
+        case TOKEN_NEW: {
+            CHECK_EXPR_OR_NULL(e, parser_expression(p, no_struct));
+            Span span = span_merge(p->lexer.span_interner, token.span, e->span);
+
+            return ast_new_new_expr(span, e);
+        }
+
+        case TOKEN_LPAREN: {
+            CHECK_EXPR_OR_NULL(e, parser_expression(p, false));
+
+            if (!parser_consume(p, TOKEN_RPAREN)) {
+                ast_expr_free(e);
+                return NULL;
+            }
+
+            e->span.start--;
+            e->span.len_or_tag++;
+
+            return e;
+        }
+
+        default: {
+            break;
+        }
+    }
+
+    UNARY(TOKEN_AMPERSAND, UNARY_REF);
+    UNARY(TOKEN_STAR, UNARY_DEREF);
+    UNARY(TOKEN_BANG, UNARY_NEG_BOOL);
+    UNARY(TOKEN_MINUS, UNARY_NEG_NUM);
+
+    return NULL;
+
+    #undef UNARY
+}
+
+Expr *parser_infix(Parser *p, Token *token, Expr *left, bool no_struct) {
+    switch (token->ty) {
+        case TOKEN_DOT: {
+            CHECK_EXPR_OR_NULL(right, parser_expression(p, no_struct));
+            Span span = span_merge(p->lexer.span_interner, left->span, right->span);
+
+            return ast_new_access_expr(span, left, right);
+        }
+
+        case TOKEN_LPAREN: {
+            ArgList args = parser_parse_arg_list(p);
+            Token closing_paren = lexer_empty_token();
+
+            if (!parser_consume_token(p, TOKEN_RPAREN, &closing_paren)) {
+                ast_free_al(&args);
+                return NULL;
+            }
+
+            Span span = span_merge(p->lexer.span_interner, left->span, closing_paren.span);
+
+            return ast_new_call_expr(span, left, args);
+        }
+
+        case TOKEN_LBRACE: {
+            InitList inits = parser_parse_init_list(p);
+            Token closing_brace = lexer_empty_token();
+
+            if (!parser_consume_token(p, TOKEN_RBRACE, &closing_brace)) {
+                ast_free_il(&inits);
+                return NULL;
+            }
+
+            Span span = span_merge(p->lexer.span_interner, left->span, closing_brace.span);
+
+            return ast_new_init_expr(span, left, inits);
+        }
+
+        case TOKEN_AS: {
+            Type ty = type_empty();
+            if (!parser_consume_type(p, &ty)) {
+                return NULL;
+            }
+
+            Span span = span_merge(p->lexer.span_interner, left->span, type_span(&ty));
+
+            return ast_new_as_expr(span, left, ty);
+        }
+
+        default: {
+            break;
+        }
+    }
+
+    // TODO
+}

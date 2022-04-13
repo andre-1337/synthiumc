@@ -19,6 +19,8 @@
 #define CHECK_EXPR_OR_NULL(name, expr) Expr *name = expr; if (name == NULL) { return NULL; }
 #define CHECK_ASSIGN_OR_NULL(name, expr) name = expr; if (name == NULL) { return NULL; }
 
+
+
 typedef struct ParseError {
     Span span;
     const char *text;
