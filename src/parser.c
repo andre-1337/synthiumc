@@ -663,3 +663,59 @@ void parser_free_statements(Ptrvec *statements) {
 
     ptrvec_free(statements);
 }
+
+Expr *parser_expression(Parser *p, bool no_struct) {
+    CHECK_EXPR_OR_NULL(left, parser_parse_expression(p, PRECEDENCE_ASSIGN, no_struct));
+
+    while (parser_peek(p).ty == TOKEN_EQ) {
+        parser_consume(p, TOKEN_EQ);
+        
+        Expr *value = parser_expression(p, no_struct);
+        if (value == NULL) {
+            ast_expr_free(left);
+            return NULL;
+        }
+
+        Span span = span_merge(p->lexer.span_interner, left->span, value->span);
+        left = ast_new_assign_expr(span, left, value);
+    }
+
+    return left;
+}
+
+Expr *parser_parse_expression(Parser *p, Precedence precedence, bool no_struct) {
+    CHECK_EXPR_OR_NULL(left, parser_prefix(p, no_struct));
+
+    while (parser_next_higher_precedence(p, precedence, no_struct)) {
+        Token token = lexer_empty_token();
+        if (!parser_advance(p, &token)) {
+            ast_expr_free(left);
+            return NULL;
+        }
+
+        Expr *infix = parser_infix(p, &token, left, no_struct);
+        if (infix == NULL) {
+            ast_expr_free(left);
+            return NULL;
+        }
+
+        left = infix;
+    }
+
+    return left;
+}
+
+bool parser_next_higher_precedence(Parser *p, Precedence precedence, bool no_struct) {
+    Token t = parser_peek(p);
+
+    if (lexer_is_err(&t) || t.ty == TOKEN_EOF) {
+        return false;
+    }
+
+    if (t.ty == TOKEN_LBRACE) {
+        return !no_struct && precedence_get(t.ty) > precedence;
+    }
+
+    return precedence_get(t.ty) > precedence;
+}
+
