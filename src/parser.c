@@ -720,12 +720,10 @@ bool parser_next_higher_precedence(Parser *p, Precedence precedence, bool no_str
 }
 
 Expr *parser_prefix(Parser *p, bool no_struct) {
-    #define UNARY(tk, typ)                                                                      \
-        if (token.ty == (tk)) {                                                                \
-            CHECK_EXPR_OR_NULL(expr, parser_parse_expression(p, PRECEDENCE_UNARY, no_struct)); \
-            Span span = span_merge(p->lexer.span_interner, token.span, expr->span);            \
-            return ast_new_unary_expr(span, (typ), expr);                                       \
-        } 0
+    #define UNARY(typ)                                                                     \
+        CHECK_EXPR_OR_NULL(expr, parser_parse_expression(p, PRECEDENCE_UNARY, no_struct)); \
+        Span span = span_merge(p->lexer.span_interner, token.span, expr->span);            \
+        return ast_new_unary_expr(span, (typ), expr)
 
     Token token = lexer_empty_token();
     if (!parser_advance(p, &token)) {
@@ -770,15 +768,26 @@ Expr *parser_prefix(Parser *p, bool no_struct) {
             return e;
         }
 
+        case TOKEN_AMPERSAND: {
+            UNARY(UNARY_REF);
+        }
+
+        case TOKEN_STAR: {
+            UNARY(UNARY_DEREF);
+        }
+
+        case TOKEN_BANG: {
+            UNARY(UNARY_NEG_BOOL);
+        }
+
+        case TOKEN_MINUS: {
+            UNARY(UNARY_NEG_NUM);
+        }
+
         default: {
             break;
         }
     }
-
-    UNARY(TOKEN_AMPERSAND, UNARY_REF);
-    UNARY(TOKEN_STAR, UNARY_DEREF);
-    UNARY(TOKEN_BANG, UNARY_NEG_BOOL);
-    UNARY(TOKEN_MINUS, UNARY_NEG_NUM);
 
     return NULL;
 
@@ -786,6 +795,12 @@ Expr *parser_prefix(Parser *p, bool no_struct) {
 }
 
 Expr *parser_infix(Parser *p, Token *token, Expr *left, bool no_struct) {
+    #define BINARY(typ)                                                          \
+        Precedence prec = precedence_get(token->ty);                             \
+        CHECK_EXPR_OR_NULL(right, parser_parse_expression(p, prec, no_struct));  \
+        Span span = span_merge(p->lexer.span_interner, left->span, right->span); \
+        return ast_new_binary_expr(span, typ, left, right)
+
     switch (token->ty) {
         case TOKEN_DOT: {
             CHECK_EXPR_OR_NULL(right, parser_expression(p, no_struct));
@@ -833,10 +848,156 @@ Expr *parser_infix(Parser *p, Token *token, Expr *left, bool no_struct) {
             return ast_new_as_expr(span, left, ty);
         }
 
+        case TOKEN_PLUS: {
+            BINARY(BINARY_ADD);
+        }
+
+        case TOKEN_MINUS: {
+            BINARY(BINARY_SUB);
+        }
+
+        case TOKEN_STAR: {
+            BINARY(BINARY_MUL);         
+        }
+
+        case TOKEN_SLASH: {
+            BINARY(BINARY_DIV);
+        }
+
+        case TOKEN_PERCENT: {
+            BINARY(BINARY_MOD);
+        }
+
+        case TOKEN_SMALLER: {
+            BINARY(BINARY_ST);
+        }
+
+        case TOKEN_SMALLER_EQ: {
+            BINARY(BINARY_SE);
+        }
+
+        case TOKEN_GREATER: {
+            BINARY(BINARY_GT);
+        }
+
+        case TOKEN_GREATER_EQ: {
+            BINARY(BINARY_GE);
+        }
+
+        case TOKEN_DOUBLE_AMPERSAND: {
+            BINARY(BINARY_LOG_AND);
+        }
+
+        case TOKEN_DOUBLE_PIPE: {
+            BINARY(BINARY_LOG_OR);
+        }
+
+        case TOKEN_DOUBLE_EQ: {
+            BINARY(BINARY_EQ);
+        }
+
+        case TOKEN_BANG_EQ: {
+            BINARY(BINARY_NE);
+        }
+
         default: {
             break;
         }
     }
 
-    // TODO
+    return NULL;
+
+    #undef BINARY
+}
+
+int32_t parser_sync(Parser *p) {
+    p->in_panic_mode = true;
+    int32_t pos = parser_inner_sync(p);
+    p->in_panic_mode = false;
+
+    return pos;
+}
+
+int32_t parser_inner_sync(Parser *p) {
+    Token previous = lexer_empty_token();
+    if (!parser_advance(p, &previous)) {
+        return lexer_end_pos(&p->lexer);
+    }
+
+    Token peek = parser_peek(p);
+    if (peek.ty != TOKEN_EOF) {
+        BigSpan span = span_get(p->lexer.span_interner, previous.span);
+        uint32_t pos = span.start + span.len;
+
+        if (previous.ty == TOKEN_SEMI && parser_peek(p).ty != TOKEN_RBRACE) {
+            return pos;
+        }
+
+        if (peek.ty == TOKEN_LET || peek.ty == TOKEN_FN) {
+            return pos;
+        }
+
+        if (!parser_advance(p, &previous)) {
+            return pos;
+        }
+
+        if (previous.ty == TOKEN_RBRACE) {
+            BigSpan span = span_get(p->lexer.span_interner, previous.span);
+            return span.start + span.len;
+        }
+
+        peek = parser_peek(p);
+    }
+
+    BigSpan span = span_get(p->lexer.span_interner, previous.span);
+    return span.start + span.len;
+}
+
+ParseError parser_create_error(Span span, const char *text) {
+    ParseError error = {
+        .span = span,
+        .text = text
+    };
+
+    return error;
+}
+
+ParseError parser_create_type_ident_error(Parser *p, Span span, const char *text, const char *reason) {
+    uint16_t len = span_get(p->lexer.span_interner, span).len;
+    return parser_create_error(span, error_err2str(ERROR_INVALID_TYPE_IDENT, len, text, reason));
+}
+
+ParseError parser_create_statement_error(Parser *p, int32_t start, int32_t end) {
+    Span span = lexer_create_span(&p->lexer, start, end);
+    uint16_t len = span_get(p->lexer.span_interner, span).len;
+
+    return parser_create_error(span, error_err2str(ERROR_COULD_NOT_PARSE_STMT, len, source_code(&p->lexer.source) + start));
+}
+
+ParseError parser_create_lex_error(Parser *p, Token *next) {
+    int32_t len = lexer_token_len(next, p->lexer.span_interner);
+    ErrorCode err_ty = ERROR_UNKNOWN_SYMBOL;
+
+    if (next->ty == TOKEN_CHAR_ERR) {
+        err_ty = ERROR_CHAR_LIT_LEN;
+    }
+
+    return parser_create_error(next->span, error_err2str(err_ty, len, next->lexeme));
+}
+
+ParseError parser_create_consume_error(Parser *p, Token *peek, TokenType expected_ty) {
+    return parser_create_consume_error_text(p, peek, lexer_token_ty_to_static_string(expected_ty));
+}
+
+ParseError parser_create_consume_error_text(Parser *p, Token *peek, const char *text) {
+    char *peek_str = NULL;
+    bool needs_free = lexer_token_to_string(peek, p->lexer.span_interner, &peek_str);
+
+    const char *err_str = error_err2str(ERROR_EXPECTED_BUT_GOT, text, peek_str);
+
+    if (needs_free) {
+        free((void *) peek_str);
+    }
+
+    return parser_create_error(peek->span, err_str);
 }
