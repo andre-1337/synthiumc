@@ -211,3 +211,69 @@ int32_t *typecheck_sorted_mods(ModuleMap *mods, SpanInterner *si) {
 
     return sorted_nums;
 }
+
+Mod *typecheck_make_mod_type(TypeChecker *tc, Module *mod, SpanInterner *si) {
+    Mod *mod_ty = (Mod *) ty_new_mod();
+    int32_t i = 0;
+    int32_t num_structs = mod_num_structs(mod);
+
+    while (i < num_structs) {
+        StructDecl *s = &mod_get_struct_at(mod, i)->decl;
+        Ty *s_ty = ty_new_placeholder_type(TY_STRUCT, sizeof(Struct));
+
+        ty_init_struct(s_ty, s->name);
+        typecheck_push_tmp_ty(tc, s_ty);
+
+        const char *name = ident_to_string(&s->name, si);
+        printf("debug: creating placeholder for '%s'\n", name);
+        free((void *) name);
+
+        scope_bind_in(&mod_ty->scope, si, &s->name, s_ty);
+        i++;
+    }
+
+    return mod_ty;
+}
+
+Ty *typecheck_lookup_ident(TypeChecker *tc, Ident *ident) {
+    return typecheck_lookup_ident_mod(tc, ident, NULL);
+}
+
+Ty *typecheck_lookup_ident_mod(TypeChecker *tc, Ident *ident, Module **out_mod) {
+    int32_t len = ident_len(ident, tc->si);
+    int32_t dot_idx = ident_index_of(ident, len, '.');
+
+    if (dot_idx < 0) {
+        return scope_lookup(&tc->ctx.scopes, ident);
+    }
+
+    Module *mod = typecheck_get_mod_by_alias(&tc->ctx, dot_idx, ident->ident);
+    if (mod == NULL) {
+        printf("[error] debug: module '%.*s' not found\n", len, ident->ident);
+        return NULL;
+    }
+
+    if (out_mod != NULL) {
+        *out_mod = mod;
+    }
+
+    Ty *ty = mod_s_lookup(mod, len - dot_idx - 1, ident->ident + dot_idx + 1);
+    if (ty == NULL) {
+        printf("[error] debug: type '%.*s' not found\n", len, ident->ident);
+        return NULL;
+    }
+
+    return ty;
+}
+
+void typecheck_check(TypeChecker *tc) {
+    int32_t i = 0;
+    while (i < mod_num_mods(tc->mods)) {
+        int32_t idx = tc->sorted_mods[i];
+        Module *m = mod_get_mod(tc->mods, idx);
+
+        typecheck_check_mod(tc, m);
+
+        i++;
+    }
+}
