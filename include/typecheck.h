@@ -12,6 +12,7 @@
 #include "path.h"
 #include "span.h"
 #include "scope.h"
+#include "tuple.h"
 #include "ident.h"
 #include "ptrvec.h"
 #include "record.h"
@@ -49,7 +50,7 @@ typedef struct Ctx {
 
 typedef struct TypeChecker {
     SpanInterner *si;
-    Map *mods;
+    ModuleMap *mods;
     int32_t *sorted_mods;
     Ptrvec temp_types;
     Ctx ctx;
