@@ -277,3 +277,196 @@ void typecheck_check(TypeChecker *tc) {
         i++;
     }
 }
+
+Mod *typecheck_check_mod(TypeChecker *tc, Module *mod) {
+    if (mod->ty != NULL) {
+        return mod->ty;
+    }
+
+    mod->ty = typecheck_make_mod_type(tc, mod, tc->si);
+
+    typecheck_free_ctx(&tc->ctx);
+    tc->ctx = typecheck_create_ctx(mod, tc->si, &tc->globals);
+
+    printf("checking '%.*s'\n", mod->path.len, mod->path.inner);
+
+    int32_t i = 0;
+    while (i < mod_num_stmts(mod)) {
+        Stmt *result = typecheck_check_stmt(tc, mod_get_stmt_at(mod, i));
+        if (result != NULL) {
+            mod_set_stmt_at(mod, i, result);
+        }
+
+        i++;
+    }
+
+    return mod->ty;
+}
+
+Ty *typecheck_push_tmp_ty(TypeChecker *tc, Ty *ty) {
+    ptrvec_push_ptr(&tc->temp_types, (void *) ty);
+    return ty;
+}
+
+void typecheck_bind(TypeChecker *tc, Ident *ident, Ty *ty) {
+    scope_bind(&tc->ctx.scopes, ident, ty);
+}
+
+void typecheck_fill_struct_fields(TypeChecker *tc, StructDecl *s_decl, Struct *s_ty) {
+    if (ty_is_initialized((Ty *) s_ty)) {
+        return;
+    }
+
+    const char *s = ident_to_string(&s_decl->name, tc->si);
+    printf("-----\ndebug: resolving '%s'\n", s);
+    free((void *) s);
+
+    bool error = false;
+    bool waiting = false;
+    int32_t nf = record_num_fields(s_decl);
+    int32_t i = 0;
+
+    while (i < nf) {
+        Field f = record_field_empty();
+
+        if (!record_field_at(s_decl, i, &f)) {
+            printf("[error] debug: todo\n");
+            return;
+        }
+
+        const char *s = type_to_string(&f.ty, tc->si);
+        printf("debug: field type = '%s'\n", s);
+        free((void *) s);
+
+        Module *mod = NULL;
+        Ty *field_ty = typecheck_lookup_ident_mod(tc, &f.ty.ident, &mod);
+
+        if (field_ty != NULL) {
+            bool is_ptr = type_is_ptr(&f.ty);
+
+            if (!ty_is_initialized(field_ty) && !is_ptr) {
+                if (ty_is_struct(field_ty)) {
+                    if (mod == NULL) {
+                        mod = tc->ctx.mod;
+                    }
+
+                    printf("debug: field type is a struct, creating a placeholder...\n");
+
+                    Ty *placeholder = ty_new_placeholder_type(TY_STRUCT, sizeof(Struct));
+                    ty_init_struct(placeholder, f.ty.ident);
+                    typecheck_push_tmp_ty(tc, placeholder);
+                    ty_push_field(s_ty, f.ident, placeholder);
+
+                    WaitingRequest request = typecheck_create_waiting_request(WAITING_STRUCT, (Ty *) s_ty, tc->ctx.mod, field_ty, mod, i);
+                    typecheck_wait_for(tc, request);
+                    waiting = true;
+                } else {
+                    printf("\ndebug: unreachable\n\n");
+                }
+            } else {
+                if (is_ptr) {
+                    field_ty = ty_new_ptr(f.ty.pointer_count, field_ty);
+                    typecheck_push_tmp_ty(tc, field_ty);
+                }
+
+                ty_push_field(s_ty, f.ident, field_ty);
+            }
+        } else {
+            error = true;
+
+            const char *s = ident_to_string(&f.ty.ident, tc->si);
+            printf("[error] debug: '%s' is null\n", s);
+            free((void *) s);
+        }
+
+        i++;
+    }
+
+    s = ident_to_string(&s_decl->name, tc->si);
+
+    if (!error && !waiting) {
+        Ty *ty = (Ty *) s_ty;
+        ty_fill_width_align(ty);
+
+        printf("debug: '%s' has a width of '%d' and an alignment of '%d'\n", s, ty->width, ty->align);
+        free((void *) s);
+
+        typecheck_update_waiting(tc, tc->ctx.mod, ty, &s_ty->name);
+
+        return;
+    }
+
+    if (error) {
+        printf("[error] debug: error while filling '%s'\n", s);
+    }
+
+    free((void *) s);
+}
+
+void typecheck_update_waiting(TypeChecker *tc, Module *mod, Ty *resolved_ty, Ident *ident) {
+    WaitingRequestMap *waiting_map = typecheck_get_waiting_map(tc, mod);
+    Vec *waiting = typecheck_get_waiting(waiting_map, tc->si, ident);
+
+    if (waiting == NULL) {
+        const char *name = ident_to_string(ident, tc->si);
+        printf("debug: no other types are waiting for '%s' (with width of '%d' and an alignment of '%d')\n", name, resolved_ty->width, resolved_ty->align);
+        free((void *) name);
+
+        return;
+    }
+
+    const char *name = ident_to_string(ident, tc->si);
+    printf("debug: there are '%lld' types waiitng for '%s'\n", waiting->len, name);
+    free((void *) name);
+
+    int32_t i = 0;
+    while (i < waiting->len) {
+        WaitingRequest *req = (WaitingRequest *) vec_get_ptr(waiting, i);
+        Ty *waiting_ty = req->to_fill;
+        Module *waiting_mod = req->to_fill_mod;
+        Struct *waiting_s_ty = (Struct *) waiting_ty;
+        Ident *waiting_ident = &waiting_s_ty->name;
+
+        StructField *placeholder = ty_field_at(waiting_s_ty, req->field_idx);
+        placeholder->ty = resolved_ty;
+
+        bool no_placeholders = ty_fill_width_align(waiting_ty);
+        if (no_placeholders) {
+            const char *name = ident_to_string(waiting_ident, tc->si);
+            printf("debug: '%s' has no placeholder left\n", name);
+            free((void *) name);
+
+            typecheck_update_waiting(tc, waiting_mod, waiting_ty, waiting_ident);
+        }
+
+        i++;
+    }
+
+    const char *s = ident_to_string(ident, tc->si);
+    printf("debug: ----- '%s' with width of '%d' and an alignment of '%d'\n", s, resolved_ty->width, resolved_ty->align);
+    free((void *) s);
+}
+
+Ident *typecheck_get_import_alias(TypeChecker *tc, ImportStmt *imp) {
+    return &imp->mod;
+}
+
+Stmt *typecheck_check_stmt(TypeChecker *tc, Stmt *s) {
+    if (ast_is_import_stmt(s)) {
+        ImportStmt *i_s = ast_as_import_stmt(s);
+        char *error = NULL;
+        Module *imported_mod = mod_try_get_mod_from_import(tc->mods, tc->ctx.mod, tc->si, i_s, &error);
+
+        if (imported_mod == NULL) {
+            typecheck_push_mk_error(tc, error, i_s->mod.ident_span);
+            return NULL;
+        }
+
+        Ident *alias = typecheck_get_import_alias(tc, i_s);
+        Mod *mod_ty = imported_mod->ty;
+
+        if (mod_ty == NULL) {
+            // todo lol i ran out of motivation for today
+        }
+    }
+}
