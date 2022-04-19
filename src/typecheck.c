@@ -466,7 +466,141 @@ Stmt *typecheck_check_stmt(TypeChecker *tc, Stmt *s) {
         Mod *mod_ty = imported_mod->ty;
 
         if (mod_ty == NULL) {
-            // todo lol i ran out of motivation for today
+            Ctx ctx = tc->ctx;
+            tc->ctx = typecheck_empty_ctx();
+
+            mod_ty = typecheck_check_mod(tc, imported_mod);
+
+            typecheck_free_ctx(&tc->ctx);
+            tc->ctx = ctx;
+        }
+
+        typecheck_bind(tc, &i_s->mod, (Ty *) mod_ty);
+
+        return s;
+    }
+
+    if (ast_is_struct_decl_stmt(s)) {
+        StructDecl *s_d = &ast_as_struct_decl_stmt(s)->decl;
+        Ty *definition = typecheck_lookup_ident(tc, &s_d->name);
+
+        if (definition == NULL) {
+            const char *name = ident_to_string(&s_d->name, tc->si);
+            printf("[debug] error: '%s' is not defined\n", name);
+            free((void *) name);
+        }
+
+        ty_init_struct(definition, s_d->name);
+        typecheck_fill_struct_fields(tc, s_d, (Struct *) definition);
+
+        return s;
+    }
+
+    if (ast_is_let_stmt(s)) {
+        LetStmt *l_s = ast_as_let_stmt(s);
+        Expr *value = typecheck_check_expr(tc, l_s->value);
+
+        if (value == NULL) {
+            return NULL;
+        }
+
+        l_s->value = value;
+        typecheck_bind(tc, &l_s->ident, l_s->value->ty);
+
+        return s;
+    }
+
+    if (ast_is_expr_stmt(s)) {
+        ExprStmt *e_s = ast_as_expr_stmt(s);
+        Expr *expr = typecheck_check_expr(tc, e_s->expr);
+        
+        if (expr == NULL) {
+            return NULL;
+        }
+
+        e_s->expr = expr;
+
+        return s;
+    }
+
+    return NULL;
+}
+
+Expr *typecheck_check_expr(TypeChecker *tc, Expr *e) {
+    if (ast_is_int_expr(e)) {
+        e->ty = ty_new_i32();
+        typecheck_push_tmp_ty(tc, e->ty);
+
+        return e;
+    }
+
+    if (ast_is_string_expr(e)) {
+        e->ty = ty_new_string();
+        typecheck_push_tmp_ty(tc, e->ty);
+
+        return e;
+    }
+
+    if (ast_is_ident_expr(e)) {
+        e->ty = typecheck_lookup_ident(tc, &ast_as_ident_expr(e)->ident);
+
+        if (e->ty == NULL) {
+            return NULL;
+        }
+
+        return e;
+    }
+
+    if (ast_is_access_expr(e)) {
+        AccessExpr *a_e = ast_as_access_expr(e);
+        Expr *left = typecheck_check_expr(tc, a_e->left);
+
+        if (left == NULL) {
+            return NULL;
+        }
+
+        a_e->left = left;
+
+        if (!ty_is_scoped(a_e->left->ty)) {
+            const char *ty_s = ty_to_string(a_e->left->ty, tc->si);
+            const char *error = fmt_str("'%s' cannot be accessed with the dot operator", ty_s);
+            free((void *) ty_s);
+
+            typecheck_push_mk_error(tc, error, a_e->left->span);
+
+            return NULL;
         }
     }
+
+    return e;
+}
+
+void typecheck_free_tc(TypeChecker *tc) {
+    typecheck_free_ctx(&tc->ctx);
+
+    int32_t i = 0;
+    while (i < tc->temp_types.len) {
+        ty_type_free((Ty *) ptrvec_get(&tc->temp_types, i));
+        i++;
+    }
+
+    ptrvec_free(&tc->temp_types);
+    free((void *) tc->sorted_mods);
+
+    i = 0;
+    while  (i < tc->errors.len) {
+        typecheck_free_err(typecheck_get_err(tc, i));
+        i++;
+    }
+
+    vec_free(&tc->errors);
+    scope_free(&tc->globals);
+
+    i = 0;
+    while (i < tc->requests.len) {
+        typecheck_free_wait_map((WaitingRequestMap *) vec_get_ptr(&tc->requests, i));
+        i++;
+    }
+
+    vec_free(&tc->requests);
 }
