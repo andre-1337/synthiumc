@@ -20,6 +20,10 @@ fn main(argc: i32, argv: []string): i32 {
 }
 ```
 
+# Building the project
+
+Clone the repository. CD into the directory where you cloned the repository to and run `make`. The result should be an executable named `synthiumc`.
+
 # Roadmap
 
   * Lexer
