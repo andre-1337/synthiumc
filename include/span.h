@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_SPAN_H
+#define SYNTHIUMC_SPAN_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,3 +38,5 @@ uint32_t span_intern(SpanInterner *si, BigSpan *span);
 BigSpan span_get(SpanInterner *si, Span span);
 BigSpan span_get_idx(SpanInterner *si, uint16_t idx);
 void span_free_interner(SpanInterner *si);
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_TYID_H
+#define SYNTHIUMC_TYID_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,3 +21,5 @@ Span type_span(Type *t);
 Type type_create_ptr(Ident ident, int32_t pointer_count);
 bool type_is_ptr(Type *t);
 const char *type_to_string(Type *t, SpanInterner *si);
+
+#endif

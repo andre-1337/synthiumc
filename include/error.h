@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_ERROR_H
+#define SYNTHIUMC_ERROR_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,3 +22,5 @@ typedef enum {
 } ErrorCode;
 
 const char *error_err2str(ErrorCode err_code, ...);
+
+#endif

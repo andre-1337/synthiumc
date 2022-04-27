@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_MOD_H
+#define SYNTHIUMC_MOD_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,3 +50,5 @@ Module *mod_get_mod_by_path(ModuleMap *mm, Path *abs_path);
 void mod_free_map(ModuleMap *mm);
 int32_t mod_get_abs_import_path(Module *m, ImportStmt *imp, SpanInterner *si, PathBuf *dest);
 Module *mod_try_get_mod_from_import(ModuleMap *mm, Module *m, SpanInterner *si, ImportStmt *imp, char **errdest);
+
+#endif

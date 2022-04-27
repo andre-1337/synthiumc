@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_MAP_H
+#define SYNTHIUMC_MAP_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,3 +48,5 @@ void map_resize_if_needed(Map *map);
 bool map_key_eq(Key *first, Key *second);
 bool map_bucket_is_empty(Bucket *b);
 void map_insert_all(Map *old_map, Map *new_map);
+
+#endif

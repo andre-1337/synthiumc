@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_LEXER_H
+#define SYNTHIUMC_LEXER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,80 +59,6 @@ typedef enum {
     TOKEN_EOF
 } TokenType;
 
-static char const *const token_strings[] = {
-    "unknown token",
-    "invalid character literal",
-    "integer",
-    "identifier",
-    "let",
-    "if",
-    "else",
-    "import",
-    "fn",
-    "while",
-    "new",
-    "delete",
-    "return",
-    "type",
-    "struct",
-    "as",
-    "extern",
-    ";",
-    ",",
-    ":",
-    ".",
-    "...",
-    "!",
-    "!=",
-    "=",
-    "==",
-    "+",
-    "-",
-    "*",
-    "/",
-    "%",
-    "<",
-    "<=",
-    ">",
-    ">=",
-    "&",
-    "&&",
-    "|",
-    "||",
-    "(",
-    ")",
-    "{",
-    "}",
-    "string",
-    "char",
-    "eof"
-};
-
-static char const *const unary_type_ops[] = {
-    "error",
-    "&",
-    "*",
-    "!",
-    "-"
-};
-
-static char const *const binary_type_ops[] = {
-    "error",
-    "+",
-    "-",
-    "*",
-    "/",
-    "%",
-    "<",
-    "<=",
-    ">",
-    ">=",
-    "&&",
-    "||",
-    "==",
-    "!="
-};
-
 typedef struct Token {
     TokenType ty;
     Span span;
@@ -182,3 +109,5 @@ Token lexer_token_from_start(Lexer *l, TokenType ty);
 const char *lexer_token_ty_to_static_string(TokenType ty);
 bool lexer_token_to_string(Token *token, SpanInterner *si, char **dest);
 int32_t lexer_token_len(Token *token, SpanInterner *si);
+
+#endif

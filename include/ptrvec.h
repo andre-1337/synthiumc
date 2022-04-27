@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_PTRVEC_H
+#define SYNTHIUMC_PTRVEC_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,3 +24,5 @@ void ptrvec_set(Ptrvec *v, int64_t i, void *elem);
 void ptrvec_resize_s(Ptrvec *v, int64_t size);
 void ptrvec_resize(Ptrvec *v);
 void ptrvec_free(Ptrvec *v);
+
+#endif

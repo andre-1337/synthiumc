@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_FUNC_H
+#define SYNTHIUMC_FUNC_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,3 +30,5 @@ void func_pl_free(ParamList *pl);
 FuncDef func_create(Token ident, ParamList params, Type ret_ty, bool is_extern);
 int32_t func_num_params(FuncDef *f);
 void func_free(FuncDef *f);
+
+#endif

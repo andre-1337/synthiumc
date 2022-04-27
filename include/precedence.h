@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_PRECEDENCE_H
+#define SYNTHIUMC_PRECEDENCE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,3 +22,5 @@ typedef enum {
 } Precedence;
 
 Precedence precedence_get(TokenType ty);
+
+#endif

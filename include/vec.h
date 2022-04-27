@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_VEC_H
+#define SYNTHIUMC_VEC_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,3 +22,5 @@ void *vec_get_ptr(Vec *v, int64_t i);
 void vec_resize(Vec *v);
 void vec_init_zero(Vec *v);
 void vec_free(Vec *v);
+
+#endif

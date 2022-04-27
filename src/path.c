@@ -69,7 +69,7 @@ int32_t path_canonicalize(Path *p, PathBuf *dest) {
     free((void *) buf);
 
     if (real == NULL) {
-        return get_errno();
+        return errno;
     }
 
     *dest = path_create_pathbuf(real);
@@ -93,7 +93,7 @@ PathBuf path_get_cwd() {
     int32_t buf_size = 255;
     const char *buf = (const char *) malloc(buf_size * sizeof(char));
 
-    if (getcwd(buf, buf_size) == NULL) {
+    if (getcwd((char *) buf, buf_size) == NULL) {
         free((void *) buf);
         return path_buf_from(path_empty());
     }

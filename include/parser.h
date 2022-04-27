@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_PARSER_H
+#define SYNTHIUMC_PARSER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +19,6 @@
 #define CONSUME_OR_NULL(ty) if (!parser_consume(p, ty)) { return NULL; }
 #define CHECK_EXPR_OR_NULL(name, expr) Expr *name = expr; if (name == NULL) { return NULL; }
 #define CHECK_ASSIGN_OR_NULL(name, expr) name = expr; if (name == NULL) { return NULL; }
-
-
 
 typedef struct ParseError {
     Span span;
@@ -84,3 +83,5 @@ ParseError parser_create_statement_error(Parser *p, int32_t start, int32_t end);
 ParseError parser_create_lex_error(Parser *p, Token *next);
 ParseError parser_create_consume_error(Parser *p, Token *peek, TokenType expected_ty);
 ParseError parser_create_consume_error_text(Parser *p, Token *peek, const char *text);
+
+#endif

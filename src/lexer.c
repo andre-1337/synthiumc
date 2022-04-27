@@ -1,5 +1,79 @@
 #include "../include/lexer.h"
 
+static char const *const token_strings[] = {
+    "unknown token",
+    "invalid character literal",
+    "integer",
+    "identifier",
+    "let",
+    "if",
+    "else",
+    "import",
+    "fn",
+    "while",
+    "new",
+    "delete",
+    "return",
+    "type",
+    "struct",
+    "as",
+    "extern",
+    ";",
+    ",",
+    ":",
+    ".",
+    "...",
+    "!",
+    "!=",
+    "=",
+    "==",
+    "+",
+    "-",
+    "*",
+    "/",
+    "%",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "&",
+    "&&",
+    "|",
+    "||",
+    "(",
+    ")",
+    "{",
+    "}",
+    "string",
+    "char",
+    "eof"
+};
+
+static char const *const unary_type_ops[] = {
+    "error",
+    "&",
+    "*",
+    "!",
+    "-"
+};
+
+static char const *const binary_type_ops[] = {
+    "error",
+    "+",
+    "-",
+    "*",
+    "/",
+    "%",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "&&",
+    "||",
+    "==",
+    "!="
+};
+
 size_t const len_token_strings = sizeof(token_strings) / sizeof(char *);
 size_t const len_unary_strings = sizeof(unary_type_ops) / sizeof(char *);
 size_t const len_binary_strings = sizeof(binary_type_ops) / sizeof(char *);
@@ -39,7 +113,7 @@ bool lexer_token_to_string(Token *token, SpanInterner *si, char **dest) {
         return true;
     }
 
-    *dest = lexer_tok2str(token->ty);
+    *dest = (char *) lexer_tok2str(token->ty);
     return false;
 }
 
@@ -118,7 +192,7 @@ bool lexer_is_letter(int32_t ch) {
 
 TokenType lexer_check_keyword(Lexer *l, int32_t start, int32_t rest_len, const char *rest, TokenType ty) {
     if (l->current - l->start == start + rest_len) {
-        if (memcmp((void *) l->start + start, (void *) rest, rest_len) == 0) {
+        if (memcmp(l->start + start, rest, rest_len) == 0) {
             return ty;
         }
     }
@@ -250,7 +324,7 @@ int32_t lexer_advance(Lexer *l) {
     int32_t c = 0;
     int32_t len = read_char(l->current, l->source_len - read_bytes, &c);
 
-    l->current++;
+    l->current += len;
 
     return c;
 }

@@ -1,4 +1,5 @@
 #include "../include/ast.h"
+#include "../include/lexer.h"
 
 struct Token;
 
@@ -745,22 +746,6 @@ void ast_free_al(ArgList *al) {
     }
 
     ptrvec_free(&al->args);
-}
-
-const char *type_to_string(Type *t, SpanInterner *si) {
-    char *ident = (char *) ident_to_string(&t->ident, si);
-    int32_t ident_len = strlen(ident);
-    int32_t len = t->pointer_count + ident_len + 1;
-    void *buffer = malloc(len);
-
-    memset(buffer, chr2int('*'), t->pointer_count);
-    memcpy(buffer + t->pointer_count, (void *) ident, ident_len);
-    free((void *) ident);
-
-    char *buf = buffer;
-    buf[len - 1] = '\0';
-
-    return (const char *) buf;
 }
 
 const char *ast_arg_list_to_string(ArgList *al, SpanInterner *si) {

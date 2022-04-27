@@ -416,7 +416,7 @@ void typecheck_update_waiting(TypeChecker *tc, Module *mod, Ty *resolved_ty, Ide
     }
 
     const char *name = ident_to_string(ident, tc->si);
-    printf("debug: there are '%lld' types waiitng for '%s'\n", waiting->len, name);
+    printf("debug: there are '%ld' types waiitng for '%s'\n", waiting->len, name);
     free((void *) name);
 
     int32_t i = 0;
@@ -463,6 +463,8 @@ Stmt *typecheck_check_stmt(TypeChecker *tc, Stmt *s) {
         }
 
         Ident *alias = typecheck_get_import_alias(tc, i_s);
+        typecheck_add_import_alias(tc, alias, imported_mod);
+
         Mod *mod_ty = imported_mod->ty;
 
         if (mod_ty == NULL) {

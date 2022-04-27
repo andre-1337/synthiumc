@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_TYPECHECK_H
+#define SYNTHIUMC_TYPECHECK_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,3 +99,5 @@ Ident *typecheck_get_import_alias(TypeChecker *tc, ImportStmt *imp);
 Stmt *typecheck_check_stmt(TypeChecker *tc, Stmt *s);
 Expr *typecheck_check_expr(TypeChecker *tc, Expr *e);
 void typecheck_free_tc(TypeChecker *tc);
+
+#endif

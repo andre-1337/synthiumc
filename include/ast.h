@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_AST_H
+#define SYNTHIUMC_AST_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -332,3 +333,5 @@ bool ast_get_init_at(InitList *il, int32_t i, Init *dest);
 void ast_push_init(InitList *il, Init init);
 void ast_free_il(InitList *il);
 const char *ast_init_list_to_string(InitList *il, SpanInterner *si);
+
+#endif

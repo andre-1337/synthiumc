@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_READER_H
+#define SYNTHIUMC_READER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,3 +29,5 @@ void reader_free_fm(FileMap *fm);
 FileAddResult reader_add_std_lib(FileMap *fm, Path *bin_path);
 FileAddResult reader_add_all(FileMap *fm, Path *bin_path, int32_t len, const char **file_names);
 int32_t reader_add_file(FileMap *fm, Path *bin_path, const char *name);
+
+#endif

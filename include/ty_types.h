@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_TYTYPES_H
+#define SYNTHIUMC_TYTYPES_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,3 +15,5 @@ typedef enum {
     TY_MOD,
     TY_STRUCT
 } TyTypes;
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_TY_H
+#define SYNTHIUMC_TY_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,3 +113,5 @@ bool ty_width_was_calculated(Ty *t);
 bool ty_fill_width_align(Ty *t);
 const char *ty_to_string(Ty *t, SpanInterner *si);
 Ty *ty_clone(Ty *t);
+
+#endif

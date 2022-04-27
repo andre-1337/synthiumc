@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_SOURCE_H
+#define SYNTHIUMC_SOURCE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,3 +21,5 @@ const char *source_code(SourceFile *sf);
 int32_t source_read(PathBuf pb, SourceFile *sf);
 uint32_t source_find_line(BigSpan *span, SourceFile *file, uint32_t *last_nl_pos);
 void source_free_sf(SourceFile *sf);
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_TUPLE_H
+#define SYNTHIUMC_TUPLE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,3 +15,5 @@ typedef struct Tuple {
 void tuple_swap(Tuple *first, Tuple *second);
 void tuple_inner_sort(Tuple *arr, int32_t len);
 int32_t *tuple_isort(const int32_t *import_nums, int32_t len);
+
+#endif

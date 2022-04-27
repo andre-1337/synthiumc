@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_RECORD_H
+#define SYNTHIUMC_RECORD_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,3 +40,5 @@ bool record_field_at(StructDecl *s, int32_t i, Field *dest);
 bool record_field_by_ident(StructDecl *s, Ident name, SpanInterner *si, Field *dest);
 const char *record_to_string(StructDecl *s, SpanInterner *si);
 void record_struct_free(StructDecl *s);
+
+#endif

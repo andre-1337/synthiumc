@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_PARAM_H
+#define SYNTHIUMC_PARAM_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,3 +17,5 @@ typedef struct Param {
 
 Param param_create(Ident name, Type ty);
 bool param_is_varargs(Param *p);
+
+#endif

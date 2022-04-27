@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_SCOPE_H
+#define SYNTHIUMC_SCOPE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,3 +40,5 @@ Scope *scope_top(ScopeStack *s);
 bool scope_bind(ScopeStack *s, Ident *ident, struct Ty *value);
 int32_t scope_num_scopes(ScopeStack *s);
 struct Ty *scope_lookup(ScopeStack *s, Ident *ident);
+
+#endif

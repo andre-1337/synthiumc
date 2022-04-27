@@ -76,6 +76,9 @@ const char *record_fields_to_string(Fields *fs, SpanInterner *si) {
         char *new_fields = (char *) malloc(new_len);
         char *old_fields = fields;
 
+        fields = strcpy(new_fields, fields);
+        free((void *) old_fields);
+
         if (extra_len > 2) {
             fields = strcat(fields, ", ");
         }

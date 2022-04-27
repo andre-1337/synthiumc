@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_UTILS_H
+#define SYNTHIUMC_UTILS_H
 
 #include <stdio.h>
 #include <errno.h>
@@ -26,3 +27,5 @@ void *int2ptr(int32_t i);
 void flag_set(uint32_t *flags, uint32_t flag);
 bool flag_get(uint32_t *flags, uint32_t flag);
 void flag_unset(uint32_t *flags, uint32_t flag);
+
+#endif

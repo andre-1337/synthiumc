@@ -1,7 +1,9 @@
-#pragma once
+#ifndef SYNTHIUMC_PATH_H
+#define SYNTHIUMC_PATH_H
 
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -38,3 +40,5 @@ PathBuf path_from_path(Path path);
 int32_t path_merge_abs_rel(Path *base, Path *child, PathBuf *dest);
 int32_t path_merge_abs_rel_suffix(Path *base, Path *child, const char *suffix, PathBuf *dest);
 void path_free(PathBuf *pb);
+
+#endif

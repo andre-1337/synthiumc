@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
         return -2;
     }
 
-    res = reader_add_all(&file_map, &compiler_path, argc - 1, argv + 1);
+    res = reader_add_all(&file_map, &compiler_path, argc - 1, (const char **) argv + 1);
     if (res.err_code != 0) {
         const char *err_msg = error_err2str(res.err_code, res.file_name);
         printf("[error] %s\n", err_msg);
@@ -152,7 +152,7 @@ void synthium_print_debug_stmt_info(Stmt *s, SpanInterner *si) {
             
             const char *tys = type_to_string(&ls->ty, si);
 
-            ty = fmt_str(": %s", tys);
+            ty = (char *) fmt_str(": %s", tys);
             free((void *) tys);
         }
 

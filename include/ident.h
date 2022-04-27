@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYNTHIUMC_IDENT_H
+#define SYNTHIUMC_IDENT_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,3 +22,5 @@ char ident_char_at(Ident *id, int32_t pos);
 int32_t ident_index_of(Ident *id, int32_t ident_len, char c);
 const char *ident_to_string(Ident *id, SpanInterner *si);
 Ident ident_from_str(Span span, const char *str);
+
+#endif
