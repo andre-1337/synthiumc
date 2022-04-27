@@ -1,0 +1,4 @@
+type Point2 struct {
+    p1: i32,
+    p2: i32
+}

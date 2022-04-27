@@ -15,3 +15,4 @@ $(OBJS): $(HEADERS)
 
 clean:
 	rm -rf src/*.o
+	rm -rf synthiumc

@@ -78,6 +78,26 @@ size_t const len_token_strings = sizeof(token_strings) / sizeof(char *);
 size_t const len_unary_strings = sizeof(unary_type_ops) / sizeof(char *);
 size_t const len_binary_strings = sizeof(binary_type_ops) / sizeof(char *);
 
+const char *lexer_get_str(int32_t index, size_t len, const char **array) {
+    if (index < 0 || index > len) {
+        return array[0];
+    }
+
+    return array[index];
+}
+
+const char *lexer_tok2str(TokenType type) {
+    return lexer_get_str(type, len_token_strings, (const char **) token_strings);
+}
+
+const char *lexer_unary2str(int32_t op) {
+    return lexer_get_str(op, len_unary_strings, (const char **) unary_type_ops);
+}
+
+const char *lexer_binary2str(int32_t type) {
+    return lexer_get_str(type, len_binary_strings, (const char **) binary_type_ops);
+}
+
 Token lexer_empty_token() {
     Token token = {
         .ty = TOKEN_UNKNOWN_ERR,
