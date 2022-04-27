@@ -7,7 +7,7 @@
 
 #include "lexer.h"
 
-typedef enum Precedence : int32_t {
+typedef enum {
     PRECEDENCE_NONE,
     PRECEDENCE_ASSIGN,
     PRECEDENCE_AND,

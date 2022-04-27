@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "source.h"
 
-typedef enum TokenType : int32_t {
+typedef enum {
     TOKEN_UNKNOWN_ERR,
     TOKEN_CHAR_ERR,
     TOKEN_INT,
@@ -131,10 +131,6 @@ static char const *const binary_type_ops[] = {
     "==",
     "!="
 };
-
-size_t const len_token_strings = sizeof(token_strings) / sizeof(char *);
-size_t const len_unary_strings = sizeof(unary_type_ops) / sizeof(char *);
-size_t const len_binary_strings = sizeof(binary_type_ops) / sizeof(char *);
 
 typedef struct Token {
     TokenType ty;

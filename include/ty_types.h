@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef enum TyTypes : int32_t {
+typedef enum {
     TY_UNKNOWN,
     TY_PTR,
     TY_I32,

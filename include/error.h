@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-typedef enum ErrorCode : int32_t {
+typedef enum {
     OK,
     ERROR_PATH_EMPTY,
     ERROR_COULD_NOT_OPEN_FILE,

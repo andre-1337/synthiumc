@@ -1,5 +1,9 @@
 #include "../include/lexer.h"
 
+size_t const len_token_strings = sizeof(token_strings) / sizeof(char *);
+size_t const len_unary_strings = sizeof(unary_type_ops) / sizeof(char *);
+size_t const len_binary_strings = sizeof(binary_type_ops) / sizeof(char *);
+
 Token lexer_empty_token() {
     Token token = {
         .ty = TOKEN_UNKNOWN_ERR,

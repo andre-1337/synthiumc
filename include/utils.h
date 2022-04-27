@@ -11,12 +11,6 @@
 
 #include "error.h"
 
-static char const *standard_library_files[] = {
-    "io.syn"
-};
-
-size_t const len_stdlib_files = sizeof(standard_library_files) / sizeof(char *);
-
 int32_t vfmt_str(char **dest, const char *fmt, va_list args);
 char const *fmt_str(const char *fmt, ...);
 int32_t num_stdlib_files();

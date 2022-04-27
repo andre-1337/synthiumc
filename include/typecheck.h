@@ -18,7 +18,7 @@
 #include "record.h"
 #include "ty_types.h"
 
-typedef enum WaitingType : int32_t {
+typedef enum WaitingType {
     WAITING_STRUCT = 1
 } WaitingType;
 

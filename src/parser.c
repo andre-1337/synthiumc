@@ -360,15 +360,18 @@ Stmt *parser_parse_if_stmt(Parser *p) {
     switch (peek.ty) {
         case TOKEN_IF: {
             else_stmt = parser_parse_if_stmt(p);
+            break;
         }
 
         case TOKEN_LBRACE: {
             else_stmt = parser_parse_block(p);
+            break;
         }
 
         default: {
             ParseError error = parser_create_consume_error_text(p, &peek, "either 'if' or '{' after 'else'");
             parser_push_err(p, error);
+            break;
         }
     }
 

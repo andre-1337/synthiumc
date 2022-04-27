@@ -1,5 +1,11 @@
 #include "../include/utils.h"
 
+static char const *standard_library_files[] = {
+    "io.syn"
+};
+
+size_t const len_stdlib_files = sizeof(standard_library_files) / sizeof(char *);
+
 int32_t get_errno() {
     return errno;
 }
