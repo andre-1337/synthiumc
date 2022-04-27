@@ -1,6 +1,6 @@
 all: synthiumc
 
-CC=gcc
+CC=clang
 CFLAGS = -Wall -Wextra -pedantic -std=gnu11
 
 OBJS = $(patsubst %.c, %.o, $(wildcard src/*.c))

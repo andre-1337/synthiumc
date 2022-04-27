@@ -1,5 +1,3 @@
-#define DEBUG_MODE
-
 #include "../include/ty.h"
 #include "../include/ast.h"
 #include "../include/mod.h"
@@ -83,15 +81,11 @@ int main(int argc, char **argv) {
 
         mod_add_mod(&mm, mod);
 
-        #ifdef DEBUG_MODE
-            synthium_print_debug_mod_info(mod, &span_interner);
-        #endif
+        synthium_print_debug_mod_info(mod, &span_interner);
 
         Stmt *s = mod_get_stmt_at(mod, 0);
         if (s != NULL) {
-            #ifdef DEBUG_MODE
-                synthium_print_debug_stmt_info(s, &span_interner);
-            #endif
+            synthium_print_debug_stmt_info(s, &span_interner);
         } else {
             printf("[error] no valid statements in file\n");
         }

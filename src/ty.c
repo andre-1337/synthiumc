@@ -245,7 +245,7 @@ bool ty_width_was_calculated(Ty *t) {
 }
 
 bool ty_fill_width_align(Ty *t) {
-    if (ty_fill_width_align(t)) {
+    if (ty_width_was_calculated(t)) {
         return true;
     }
 
