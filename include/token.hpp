@@ -13,6 +13,6 @@ namespace Synthium {
         public: Type type;
         public: string lexeme;
 
-        
+
     };
 }
