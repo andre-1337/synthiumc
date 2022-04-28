@@ -19,4 +19,10 @@ using f32 = float;
 using f64 = double;
 using f80 = long double;
 
-using string = std::string &;
+using usize = unsigned long long;
+using isize = signed long long;
+
+using string = std::string;
+using string_ref = std::string &;
+
+template <typename T> using vec = std::vector<T>;
