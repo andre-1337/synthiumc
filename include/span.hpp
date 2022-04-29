@@ -7,9 +7,8 @@ namespace Synthium {
         private: string _start;
         private: string _end;
 
-        public: inline Span(string start, string end) : _start(start), _end(end) {}
-
         public: inline Span() : _start(nullptr), _end(nullptr) {}
+        public: inline Span(string start, string end) : _start(start), _end(end) {}
 
         public: inline string get_start() {
             return this->_start;

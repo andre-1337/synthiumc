@@ -11,4 +11,10 @@ namespace Synthium {
             return content;
         }
     }
+
+    namespace Utils {
+        inline void create_spinner(string text) {
+
+        }
+    }
 }

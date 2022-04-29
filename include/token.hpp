@@ -89,8 +89,8 @@ namespace Synthium {
         private: Type _type;
 
         public: inline Token() : _span(Synthium::Span()), _type(Type::UnknownErr) {}
-        public: inline Token(Type type, string start, string end) : _span(Synthium::Span(start, end)), _type(type) {}
         public: inline Token(Type type, Synthium::Span span) : _span(span), _type(type) {}
+        public: inline Token(Type type, string start, string end) : _span(Synthium::Span(start, end)), _type(type) {}
 
         public: inline Span get_span() {
             return this->_span;
