@@ -88,7 +88,9 @@ namespace Synthium {
         private: Span _span;
         private: Type _type;
 
-        public: Token() : _type(Type::UnknownErr), _span(Synthium::Span()) {}
+        public: inline Token() : _span(Synthium::Span()), _type(Type::UnknownErr) {}
+        public: inline Token(Type type, string start, string end) : _span(Synthium::Span(start, end)), _type(type) {}
+        public: inline Token(Type type, Synthium::Span span) : _span(span), _type(type) {}
 
         public: inline Span get_span() {
             return this->_span;
@@ -98,7 +100,7 @@ namespace Synthium {
             return this->_type;
         }
 
-        public: string get_lexeme() {
+        public: inline string get_lexeme() {
             return this->_span.get_start();
         }
 

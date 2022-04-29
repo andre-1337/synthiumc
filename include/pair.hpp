@@ -7,7 +7,7 @@ namespace Synthium {
         private: K _key;
         private: V _value;
 
-        public: Pair(K key, V value) : _key(key), _value(value) {}
+        public: inline Pair(K key, V value) : _key(key), _value(value) {}
 
         public: inline K get_key() {
             return this->_key;

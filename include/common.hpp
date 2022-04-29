@@ -27,5 +27,7 @@ using isize = signed long long;
 using string = std::string;
 using string_ref = std::string &;
 
-template <typename T> using vec = std::vector<T>;
-template <typename T1, typename T2> using map = std::map<T1, T2>;
+namespace Synthium {
+    template <typename T> using Vec = std::vector<T>;
+    template <typename T1, typename T2> using Map = std::map<T1, T2>;
+}
